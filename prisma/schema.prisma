@@ -8,32 +8,137 @@ generator client {
 }
 
 model User {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String
-  lastName String
+  id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  username  String     @unique
-  phone  String
+  username String @unique
+  phone    String
 
-  email     String     @unique
-  password  String
+  email    String @unique
+  password String
 
-  role      UserRole   @default(USER)
-  address  String
-  city  String
-  state String
-  zipCode String
+  role UserRole @default(USER)
 
-   socialMedia Json       @default("[]")
-   uploadId String
-   uploadSelfieId  String
+  customer Customer?
+
+  admin Admin?
+
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@map("users")
+
 }
 
+model Customer {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  email     String @unique
+  user      User?  @relation(fields: [email], references: [email])
+  firstName String
+  lastName  String
+  address   String
+  city      String
+  state     String
+  zipCode   String
+
+
+
+  socialMedia                    Json                           @default("[]")
+  uploadId                       String
+  uploadSelfieId                 String
+
+   review ReviewModel[]
+
+  familiarityType                FamiliarityType
+  experienceEffect               ExperienceEffect
+  terpeneProfile                 TerpeneProfile
+  categories                     Categories
+  strain                         Strain
+  tasteFlavor                    TasteFlavor
+  oftenConsume                   OftenConsume
+  typicallyConsume               TypicallyConsume
+  californiaProducts             CaliforniaProducts
+  newProductsInDifferentCategory NewProductsInDifferentCategory
+  typicalProducts                TypicalProducts
+  popularProducts                PopularProducts
+  staffFavorites                 StaffFavorites
+
+  @@map("customers")
+}
+
+model Admin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  userName String @unique
+
+  email String @unique
+  user  User?  @relation(fields: [email], references: [email])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Product {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  price   String
+  details String
+  reviews ReviewModel[]
+  @@map("products")
+
+}
+
+model Category {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String
+
+  @@map("categories")
+}
+
+model Brand {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  brandName  String
+  brandImage String
+
+  @@map("brands")
+}
+
+model CartModel {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  quantity   Int
+  totalPrice Float
+
+  @@map("cartModels")
+}
+
+model BillingAddress {
+    id         String @id @default(auto()) @map("_id") @db.ObjectId
+  firstName String
+
+  lastName String
+  dity String
+  state String
+  zipCode String
+  adress String
+  cuponCode String
+
+  @@map("billingAddress")
+}
+
+model ReviewModel {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  rating Int
+  review String
+
+  productId String
+  customerId    String
+
+  product   Product @relation(fields: [productId], references: [id])
+  customer      Customer    @relation(fields: [customerId], references: [id])
+
+  @@map("reviews")
+}
 enum UserStatus {
   ACTIVE
   BLOCKED
@@ -44,4 +149,116 @@ enum UserRole {
   ADMIN
   SUPER_ADMIN
   USER
+}
+
+enum FamiliarityType {
+  BEGINNER
+  INTERMEDIATE
+  EXPERT
+}
+
+enum ExperienceEffect {
+  SENSUAL
+  HUNGRY
+  CREATIVE
+  CALM
+  MINDFUL
+  MOTIVATED
+  ALERT
+  WORRIED
+  STONED
+  HAPPY
+  ENERGIZED
+  RELAXED
+  EUPHORIC
+}
+
+enum TerpeneProfile {
+  ALL
+  APPLE
+  BANANA
+  BERRY
+  CANDY
+  EARTHY
+  FLORAL
+  GASSY
+  GRAPES
+  LEMON
+  MINT
+  NUTTY
+  ORANGE
+  PEACH
+  PEPPERY
+  PINE
+  STRAWBERRY
+  SWEET
+  WOOD
+}
+
+enum Categories {
+  ALL
+  FLOWER
+  EDIBLES
+  VAPES
+  CONCENTRATES
+  PREROLLS
+}
+
+enum Strain {
+  INDICA
+  SATIVA
+  HYBRID
+  SATIVADOMINANT
+  INDICADOMINANT
+  NO
+}
+
+enum TasteFlavor {
+  ALOT
+  KINDOF
+  NOTATALL
+}
+
+enum OftenConsume {
+  EVERYDAY
+  Often
+  SOMETIMES
+  RARELY
+  NEVER
+}
+
+enum TypicallyConsume {
+  DAYTIME
+  MIDDAY
+  NIGHTTIME
+  ANYTIME
+}
+
+enum CaliforniaProducts {
+  YES
+  NO
+}
+
+enum NewProductsInDifferentCategory {
+  YES
+  NO
+}
+
+enum TypicalProducts {
+  HIGHEND
+  MIDRANGE
+  BUDGET
+  NOBUDGET
+}
+
+enum PopularProducts {
+  YES
+  KINDOF
+  DOESNOTREALLYMATTER
+  NO
+}
+
+enum StaffFavorites {
+  YES
+  NO
 }
