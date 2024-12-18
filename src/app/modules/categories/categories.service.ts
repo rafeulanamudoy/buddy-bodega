@@ -1,21 +1,23 @@
-import { Brand } from "@prisma/client";
+import { Brand, Category } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 
-const createCategory = async (payload: Brand) => {
-  const isExist = await prisma.brand.findFirst({
+const createCategory = async (payload: Category) => {
+  const isExist = await prisma.category.findUnique({
     where: {
-      brandName: payload.brandName.trim().toUpperCase(),
+      categoryName: payload.categoryName.trim().toUpperCase(),
     },
   });
   if (isExist) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "this brandname already exist");
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "this category name already exist"
+    );
   }
-  const result = await prisma.brand.create({
+  const result = await prisma.category.create({
     data: {
-      brandName: payload.brandName.trim().toUpperCase(),
-      brandImage: payload.brandImage,
+      categoryName: payload.categoryName.trim().toUpperCase(),
     },
   });
 
@@ -23,19 +25,19 @@ const createCategory = async (payload: Brand) => {
 };
 
 const getCategories = async () => {
-  const result = await prisma.brand.findMany({});
+  const result = await prisma.category.findMany({});
   return result;
 };
 
-const deleteSingleBrand = async (id: string) => {
-  const isExist = await prisma.brand.findFirst({
+const deleteSingleCategory = async (id: string) => {
+  const isExist = await prisma.category.findUnique({
     where: {
       id: id,
     },
   });
 
   if (!isExist) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "brand not exist ");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "category  not exist ");
   }
   const result = await prisma.brand.delete({
     where: {
@@ -45,15 +47,15 @@ const deleteSingleBrand = async (id: string) => {
   return result;
 };
 
-const updateSingleCategories = async (id: string, payload: Brand) => {
-  const isExist = await prisma.brand.findFirst({
+const updateSingleCategories = async (id: string, payload: Category) => {
+  const isExist = await prisma.category.findUnique({
     where: {
       id: id,
     },
   });
 
   if (!isExist) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "brand not exist ");
+    throw new ApiError(httpStatus.UNAUTHORIZED, "category not exist ");
   }
   const result = await prisma.brand.update({
     where: {
@@ -66,9 +68,9 @@ const updateSingleCategories = async (id: string, payload: Brand) => {
   return result;
 };
 
-export const brandService = {
+export const categoryService = {
   createCategory,
   getCategories,
-  deleteSingleBrand,
+  deleteSingleCategory,
   updateSingleCategories,
 };

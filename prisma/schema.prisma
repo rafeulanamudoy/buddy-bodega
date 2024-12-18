@@ -105,7 +105,7 @@ model Product {
 // Category model
 model Category {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  categoryName String
+  categoryName String  @unique
   products     Product[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -116,7 +116,7 @@ model Category {
 // Brand model
 model Brand {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  brandName  String
+  brandName  String @unique
   brandImage String
   products   Product[]
   createdAt  DateTime  @default(now())
