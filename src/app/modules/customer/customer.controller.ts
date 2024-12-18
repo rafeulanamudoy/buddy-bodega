@@ -69,8 +69,14 @@ const updateProfile=catchAsync(async (req: any, res: Response) => {
   console.log(req.user, "check req.user");
   const data=req.body;
 
-  const {firstName,lastName,phone,profileImage,...customerProfile}=data
-  const auth={firstName,lastName,phone,profileImage}
+  if(req.body.email ||  req.body.phone){
+    throw new ApiError(httpStatus.UNAUTHORIZED,"you are not allowed to update email or phone number")
+  }
+
+  const {firstName,lastName,profileImage,nickName,...customerProfile}=data
+
+  
+  const auth={firstName,lastName,profileImage,nickName}
   const result = await customerService.updateCustomerByemail(req.user.email,customerProfile,auth);
   sendResponse(res, {
     success: true,
