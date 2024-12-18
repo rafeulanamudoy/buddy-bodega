@@ -1,25 +1,30 @@
+import { UserRole } from "@prisma/client";
 import express from "express";
-import { authController } from "./auth.controller";
-import validateRequest from "../../middlewares/validateRequest";
-import { authValidation } from "./auth.validation";
 import auth from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
+import { AuthController } from "./auth.controller";
+import { authValidation } from "./auth.validation";
 
 const router = express.Router();
 
-//login user
-router.post(
-  "/login",
-  validateRequest(authValidation.authLoginSchema),
-  authController.loginUser
-);
+// user login route
+router.post("/login",  AuthController.loginUser);
 
-router.get("/profile", auth(), authController.getProfile);
+router.post("/otp-enter", AuthController.enterOtp);
+
+// user logout route
+router.post("/logout", AuthController.logoutUser);
+
 
 router.put(
-  "/profile",
-  validateRequest(authValidation.updateProfileSchema),
-  auth(),
-  authController.updateProfile
+  "/change-password",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
+  validateRequest(authValidation.changePasswordValidationSchema),
+  AuthController.changePassword
 );
+
+router.post("/forgot-password", AuthController.forgotPassword);
+
+router.post("/reset-password", AuthController.resetPassword);
 
 export const authRoute = router;

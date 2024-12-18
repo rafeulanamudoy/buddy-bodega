@@ -35,7 +35,7 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
     uploadFileToSpace(uploadSelfieIdFile, "customerSelfieIdFile"),
   ]);
 
-  console.log(uploadIdUrl,"check url")
+  // console.log(uploadIdUrl,"check url")
   const customerProfileData = {
     ...data,
     uploadId: uploadIdUrl,
@@ -45,7 +45,7 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
   // Call service to create the customer
   const result = await customerService.createCustomer(customerProfileData);
 
-  const {otp,otpExpiry,identifier,password,createdAt,...others}=result
+  const { otp, otpExpiry, identifier, password, createdAt, ...others } = result;
 
   sendResponse(res, {
     success: true,
@@ -54,8 +54,33 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
     data: others,
   });
 });
+const getSingleCustomer = catchAsync(async (req: any, res: Response) => {
+  console.log(req.user, "check req.user");
 
+  const result = await customerService.getSingleCustomer(req.user.id);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Customer account get successfully.",
+    data: result,
+  });
+});
+const updateProfile=catchAsync(async (req: any, res: Response) => {
+  console.log(req.user, "check req.user");
+  const data=req.body;
+
+  const {firstName,lastName,phone,profileImage,...customerProfile}=data
+  const auth={firstName,lastName,phone,profileImage}
+  const result = await customerService.updateCustomerByemail(req.user.email,customerProfile,auth);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: " customer account updated successfully.",
+    data: result,
+  });
+});
 export const customerController = {
   createCustomer,
+  getSingleCustomer,
+  updateProfile
 };
-

@@ -1,55 +1,110 @@
 import { Request, Response } from "express";
+import httpStatus from "http-status";
+
+import config from "../../../config";
 import catchAsync from "../../../shared/catchAsync";
-import { authService } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
+import { AuthServices } from "./auth.service";
 
-//login user
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await authService.loginUserIntoDB(req.body);
-
-  res.cookie("accessToken", result.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-
+  const result = await AuthServices.loginUser(req.body);
   sendResponse(res, {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     success: true,
-    message: "User successfully logged in",
+    message: "OTP sent successfully",
     data: result,
   });
 });
 
-// get profile for logged in user
-const getProfile = catchAsync(async (req: any, res: Response) => {
-  const { id } = req.user;
-  const user = await authService.getProfileFromDB(id);
+const enterOtp = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.enterOtp(req.body);
+
+  // res.cookie("token", result.accessToken, { httpOnly: true });
+  res.cookie("token", result.accessToken, {
+    secure: config.env === "production",
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+  });
 
   sendResponse(res, {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     success: true,
-    message: "User profile retrieved successfully",
-    data: user,
+    message: "User logged in successfully",
+    data: result,
   });
 });
 
-// update user profile only logged in user
-const updateProfile = catchAsync(async (req: any, res: Response) => {
-  const { id } = req.user;
-  const updatedUser = await authService.updateProfileIntoDB(id, req.body);
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  // Clear the token cookie
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 
   sendResponse(res, {
-    statusCode: 200,
+    statusCode: httpStatus.OK,
     success: true,
-    message: "User profile updated successfully",
-    data: updatedUser,
+    message: "User Successfully logged out",
+    data: null,
   });
 });
 
-export const authController = {
+// get user profile
+;
+
+// change password
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const userToken = req.headers.authorization;
+  const { oldPassword, newPassword } = req.body;
+
+  const result = await AuthServices.changePassword(
+    userToken as string,
+    newPassword,
+    oldPassword
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "Password changed successfully",
+    data: result,
+  });
+});
+
+// forgot password
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const data = await AuthServices.forgotPassword(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Check your email!",
+    data: data,
+  });
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization || "";
+
+  await AuthServices.resetPassword(token, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password Reset!",
+    data: null,
+  });
+});
+
+
+export const AuthController = {
   loginUser,
-  getProfile,
-  updateProfile,
+  enterOtp,
+  logoutUser,
+
+  changePassword,
+  forgotPassword,
+  resetPassword,
 };

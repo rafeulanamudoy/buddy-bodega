@@ -20,9 +20,6 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("User not found");
   }
 
-  // if (userData.status === UserStatus.INACTIVE) {
-  //   throw new Error("Your account is inactive");
-  // }
 
   if (!payload.password || !userData?.password) {
     throw new Error("Password is required");
@@ -69,7 +66,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
 </body>
 </html>`;
 
-  await emailSender("OTP", userData.email, html); 
+  await emailSender("OTP", userData.email, html);
 
   await prisma.user.update({
     where: {
@@ -81,8 +78,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     },
   });
 
-  return randomOtp
-
+  return randomOtp;
 };
 
 // user login
@@ -130,8 +126,8 @@ const enterOtp = async (payload: { otp: string; identifier: string }) => {
       id: userData.id,
     },
     data: {
-      otp: null,
-      otpExpiry: null,
+      otp: undefined,
+      otpExpiry: undefined,
     },
   });
 
@@ -144,59 +140,7 @@ const enterOtp = async (payload: { otp: string; identifier: string }) => {
 };
 
 // get user profile
-const getMyProfile = async (userToken: string) => {
-  const decodedToken = jwtHelpers.verifyToken(
-    userToken,
-    config.jwt.jwt_secret!
-  );
 
-  const result = await prisma.$transaction(async (TransactionClient) => {
-    const userProfile = await TransactionClient.user.findUnique({
-      where: {
-        id: decodedToken?.id,
-      },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        status: true,
-        profileImage: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-
-    if (!userProfile) {
-      throw new ApiError(404, "User not found");
-    }
-
-    // if (userProfile.status === UserStatus.INACTIVE) {
-    //   throw new ApiError(403, "Your account is inactive");
-    // }
-
-    if (userProfile.role === UserRole.USER) {
-      const customerProfile = await TransactionClient.user.findUnique({
-        where: {
-          email: userProfile.email,
-        },
-      });
-
-      return { ...userProfile, ...customerProfile };
-    }  else if (userProfile.role === UserRole.ADMIN) {
-      const adminProfile = await TransactionClient.admin.findUnique({
-        where: {
-          email: userProfile.email,
-        },
-      });
-
-      return { ...userProfile, ...adminProfile };
-    }
-
-    return userProfile;
-  });
-
-  return result;
-};
 
 // change password
 const changePassword = async (
@@ -204,7 +148,6 @@ const changePassword = async (
   newPassword: string,
   oldPassword: string
 ) => {
-
   // console.log(userToken, newPassword, oldPassword);
   const decodedToken = jwtHelpers.verifyToken(
     userToken,
@@ -214,8 +157,6 @@ const changePassword = async (
   const user = await prisma.user.findUnique({
     where: { id: decodedToken?.id },
   });
-
-  
 
   if (!user || !user?.password) {
     throw new ApiError(404, "User not found");
@@ -240,13 +181,13 @@ const changePassword = async (
   return { message: "Password changed successfully" };
 };
 
+// forgot password
 const forgotPassword = async (payload: { email: string }) => {
   const userData = await prisma.user.findUnique({
     where: {
       email: payload.email,
     },
   });
-  // console.log(userData)
   if (!userData) {
     throw new ApiError(404, "User not found");
   }
@@ -277,17 +218,17 @@ const forgotPassword = async (payload: { email: string }) => {
         </div>
         <div style="padding: 40px 30px;">
             <p style="font-size: 16px; margin-bottom: 20px;">Dear User,</p>
-            
+
             <p style="font-size: 16px; margin-bottom: 30px;">We received a request to reset your password. Click the button below to reset your password:</p>
-            
+
             <div style="text-align: center; margin-bottom: 30px;">
                 <a href=${resetPassLink} style="display: inline-block; background-color: #FF7600; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: 600; transition: background-color 0.3s ease;">
                     Reset Password
                 </a>
             </div>
-            
+
             <p style="font-size: 16px; margin-bottom: 20px;">If you did not request a password reset, please ignore this email or contact support if you have any concerns.</p>
-            
+
             <p style="font-size: 16px; margin-bottom: 0;">Best regards,<br>Your Support Team</p>
         </div>
         <div style="background-color: #f8f9fa; padding: 20px; text-align: center; font-size: 14px; color: #6c757d;">
@@ -309,8 +250,7 @@ const resetPassword = async (
   token: string,
   payload: { id: string; password: string }
 ) => {
-
-  // console.log( payload, token);
+  // console.log(token)
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       id: payload.id,
@@ -330,10 +270,10 @@ const resetPassword = async (
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
   }
 
+  console.log(payload.password)
   // hash password
   const password = await bcrypt.hash(payload.password, 12);
 
-  // update into database
   await prisma.user.update({
     where: {
       id: payload.id,
@@ -346,11 +286,10 @@ const resetPassword = async (
 };
 
 
-
 export const AuthServices = {
   loginUser,
   enterOtp,
-  getMyProfile,
+
   changePassword,
   forgotPassword,
   resetPassword,

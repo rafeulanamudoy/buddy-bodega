@@ -3,8 +3,7 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import fs from "fs";
-import sharp from "sharp"; // Import sharp.js for image compression
+import sharp, { Metadata } from "sharp"; // Import sharp.js for image compression
 import config from "../config";
 
 // Configure DigitalOcean Spaces
@@ -29,9 +28,21 @@ export const uploadFileToSpace = async (
   }
 
   try {
-    // Compress image using sharp.js
+    // Get image metadata
+    const metadata: Metadata = await sharp(file.buffer).metadata();
+
+    // Conditional resizing
+    let resizeOptions = {};
+    if (metadata.height && metadata.height > 500) {
+      resizeOptions = { height: 500 };
+    } else if (metadata.width && metadata.width > 500) {
+      resizeOptions = { width: 500 };
+    } else if (metadata.height && metadata.width && metadata.height > 500 && metadata.width > 500) {
+      resizeOptions = { width: 500, height: 500 };
+    }
+
     const compressedBuffer = await sharp(file.buffer)
-      .resize({ width: 800 }) // Resize image for optimization
+      .resize(resizeOptions)
       .toBuffer();
 
     const params = {
