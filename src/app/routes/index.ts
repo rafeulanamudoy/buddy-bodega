@@ -21,7 +21,7 @@ const moduleRoutes = [
     route: customerRoute,
   },
   {
-    path: "brand",
+    path: "/brand",
     route: brandRoute,
   },
 ];

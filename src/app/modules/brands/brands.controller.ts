@@ -3,9 +3,21 @@ import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { brandService } from "./brands.service";
+import ApiError from "../../errors/ApiErrors";
+import { uploadFileToSpace } from "../../../helpers/uploaderToS3";
 
 const createBrand = catchAsync(async (req: Request, res: Response) => {
-  const result = await brandService.createBrand(req.body);
+  const file = req.file;
+
+  if (!file) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "you have to upload brand image"
+    );
+  }
+  const brandImageUrl = await uploadFileToSpace(file, "brands");
+  const data = { ...req.body, brandImage: brandImageUrl };
+  const result = await brandService.createBrand(data);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -33,7 +45,15 @@ const deleteSingleBrand = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const updateSingleBrand = catchAsync(async (req: Request, res: Response) => {
-  const result = await brandService.updateSingleBrand(req.params.id, req.body);
+  const file = req.file;
+  let data = req.body;
+  let brandImageUrl;
+  if (file) {
+    brandImageUrl = await uploadFileToSpace(file, "brands");
+    data = { ...req.body, brandImage: brandImageUrl };
+  }
+
+  const result = await brandService.updateSingleBrand(req.params.id, data);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
