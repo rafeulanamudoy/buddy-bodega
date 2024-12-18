@@ -78,21 +78,23 @@ model Admin {
 
 // Product model
 model Product {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  price       String
-  details     String
-  categoryId  String       @db.ObjectId
-  brandId     String?      @db.ObjectId
-  category    Category     @relation(fields: [categoryId], references: [id])
-  brand       Brand?       @relation(fields: [brandId], references: [id])
-  reviews     ReviewModel[]
-  carts       CartModel[]
-   createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id                String       @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  mainPrice         Float        
+  status            ProductStatus @default(ACTIVE)
+  details           String
+  categoryId        String       @db.ObjectId
+  brandId           String?      @db.ObjectId
+  category          Category     @relation(fields: [categoryId], references: [id])
+  brand             Brand?       @relation(fields: [brandId], references: [id])
+  reviews           ReviewModel[]
+  carts             CartModel[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   @@map("products")
 }
+
 
 // Category model
 model Category {
@@ -218,7 +220,7 @@ model Invoice {
 model Coupon {
   id             String    @id @default(auto()) @map("_id") @db.ObjectId
   code           String    @unique
-  discountType   DiscountType
+  discountType   CouponDiscountType
   discountValue  Float
   minOrderAmount Float?
   usageLimit     Int?
@@ -231,11 +233,15 @@ model Coupon {
   @@map("coupons")
 }
 
-enum DiscountType {
+enum CouponDiscountType {
   PERCENTAGE
   FIXED
 }
-
+enum ProductStatus {
+  ACTIVE     
+  UPCOMING   
+  SELLING   
+}
 enum CouponStatus {
   ACTIVE
   EXPIRED
