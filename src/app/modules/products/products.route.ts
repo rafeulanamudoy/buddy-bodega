@@ -10,16 +10,17 @@ const router = express.Router();
 router.post(
   "/create-product",
   //   auth(UserRole.ADMIN),
-  multerUpload.single("productImage"),
+    multerUpload.single("productImage"),
   parseBodyData,
 
   productController.createProduct
 );
-router.get("/:id", productController.getSingleProduct);
 router.get(
-  "/",
+  "/get-all-products",
   auth(UserRole.ADMIN, UserRole.USER),
   productController.getProducts
 );
+router.get("/single-product/:id", productController.getSingleProduct);
+
 
 export const productRoute = router;

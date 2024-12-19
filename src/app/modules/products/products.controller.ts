@@ -4,6 +4,9 @@ import { productService } from "./products.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import ApiError from "../../errors/ApiErrors";
+import pick from "../../../shared/pick";
+import { filterableField } from "../../../helpers/searchableField";
+import { paginationFileds } from "../../../helpers/paginationOption";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
     // console.log(req.user, "check req.user");
@@ -41,9 +44,12 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
     });
   });
   const getProducts = catchAsync(async (req: Request, res: Response) => {
-    // console.log(req.user, "check req.user");
+    // console.log(req.user, "check reconst paginationOptions = pick(req.query, paginationFileds);
+    const paginationOptions = pick(req.query, paginationFileds);
+  // console.log(req.query, "querty check from controller");
+  const filters = pick(req.query, filterableField)
   
-    const result = await productService.getSingleProduct(req.params.id);
+    const result = await productService.getProducts(filters,paginationOptions);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,
