@@ -6,10 +6,12 @@ export const initiateSuperAdmin = async () => {
   const payload = {
     firstName: "Super",
     lastName: "Admin",
-    userName: "superAdmin",
+    nickName: "superAdmin",
     email: "superadmin@gmail10p.com",
     password: "123456",
     role: UserRole.SUPER_ADMIN,
+
+    phone: "01515635005",
   };
 
   const existingSuperAdmin = await prisma.user.findUnique({
@@ -38,7 +40,7 @@ export const initiateSuperAdmin = async () => {
     await TransactionClient.admin.create({
       data: {
         email: payload.email,
-        userName: payload.userName,
+        nickName: payload.nickName,
       },
     });
   });

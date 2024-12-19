@@ -72,7 +72,7 @@ model Customer {
 // Admin model (extends User for admin-specific details)
 model Admin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  userName String @unique
+  nickName String @unique
   email    String @unique
   user     User?  @relation(fields: [email], references: [email])
 

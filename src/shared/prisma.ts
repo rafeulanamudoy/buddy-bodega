@@ -1,46 +1,29 @@
 import { PrismaClient } from "@prisma/client";
+import { initiateSuperAdmin } from "../app/db/db";
 
-const prisma = new PrismaClient({
-    log: [
-        {
-            emit: 'event',
-            level: 'query',
-        },
-        {
-            emit: 'event',
-            level: 'error',
-        },
-        {
-            emit: 'event',
-            level: 'info',
-        },
-        {
-            emit: 'event',
-            level: 'warn',
-        },
-    ],
-})
+const prisma = new PrismaClient();
 
-prisma.$on('query', (e) => {
-    console.log("-------------------------------------------")
-    console.log('Query: ' + e.query);
-    console.log("-------------------------------------------")
-    console.log('Params: ' + e.params)
-    console.log("-------------------------------------------")
-    console.log('Duration: ' + e.duration + 'ms')
-    console.log("-------------------------------------------")
-})
+// Handle connection issues
+async function connectPrisma() {
+  try {
+    await prisma.$connect();
+    console.log("Prisma connected to the database successfully!");
 
-// prisma.$on('warn', (e) => {
-//     console.log(e)
-// })
+    // initiate super admin
+    initiateSuperAdmin();
+  } catch (error) {
+    console.error("Prisma connection failed:", error);
+    process.exit(1); // Exit process with failure
+  }
 
-// prisma.$on('info', (e) => {
-//     console.log(e)
-// })
+  // Graceful shutdown
+  process.on("SIGINT", async () => {
+    await prisma.$disconnect();
+    console.log("Prisma disconnected due to application termination.");
+    process.exit(0);
+  });
+}
 
-// prisma.$on('error', (e) => {
-//     console.log(e)
-// })
+connectPrisma();
 
 export default prisma;

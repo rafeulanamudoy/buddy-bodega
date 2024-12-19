@@ -35,6 +35,7 @@ app.get("/", (req: Request, res: Response) => {
 // Router setup
 app.use("/api/v1", router);
 
+
 // Global Error Handler
 app.use(GlobalErrorHandler);
 
