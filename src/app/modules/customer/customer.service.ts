@@ -81,6 +81,7 @@ export const getSingleCustomer = async (id: string) => {
     where: {
       id: id,
     },
+   
   });
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Customer Account  not found!");

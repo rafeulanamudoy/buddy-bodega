@@ -32,9 +32,19 @@ const createCart = catchAsync(async (req: Request, res: Response) => {
       data: result,
     });
   });
+  const getCartByCustomer = catchAsync(async (req: any, res: Response) => {
+    const result = await cartService.getCartByCustomer(req.user.id);
+    sendResponse(res, {
+      statusCode: httpStatus.CREATED,
+      success: true,
+      message: "cart get   successfully",
+      data: result,
+    });
+  });
 
   export const cartController={
     createCart,
     updateCart,
-    deleteCart
+    deleteCart,
+    getCartByCustomer
   }
