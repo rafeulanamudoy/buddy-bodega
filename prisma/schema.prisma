@@ -87,7 +87,7 @@ model Product {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   name          String        @unique
   mainPrice     Float
-  productImage   String
+  productImage  String
   discountPrice Float?        @default(0)
   status        ProductStatus @default(ACTIVE)
   details       String
@@ -133,8 +133,8 @@ model Category {
 model CartModel {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  quantity   Int
-  totalPrice Float
+  quantity Int
+
   customerId String   @db.ObjectId
   productId  String   @db.ObjectId
   customer   Customer @relation(fields: [customerId], references: [id])
