@@ -61,7 +61,7 @@ const getProducts = async (
 
   const { query, ...filtersData } = filters;
   console.log(filtersData, "check filters data");
-
+  
   const andCondition: Prisma.ProductWhereInput[] = [];
 
   if (query) {
@@ -85,6 +85,20 @@ const getProducts = async (
       ],
     });
   }
+
+  if(filtersData.sale){
+    console.log("check sale")
+    andCondition.push({
+      OR:[
+
+        {
+          discountPrice:{
+            gt:0
+          }
+        }
+      ]
+    })
+  }
   if (filtersData.category) {
     andCondition.push({
       category: {
@@ -95,32 +109,6 @@ const getProducts = async (
     });
   }
 
-  // Filtering by price range
-  // if (minPriceRange && maxPriceRange) {
-  //   const [minPrice, maxPrice] = minPriceRange
-  //     .split('to')
-  //     .map(price => parseFloat(price.trim()));
-
-  //   andCondition.push({
-  //     price: {
-  //       gte: minPrice,
-  //       lte: maxPrice,
-  //     },
-  //   });
-  // } else if (minPriceRange) {
-  //   const minPrice = parseFloat(minPriceRange);
-  //   andCondition.push({
-  //     price: {
-  //       gte: minPrice,
-  //     },
-  //   });
-  // } else if (maxPriceRange) {
-  //   const maxPrice = parseFloat(maxPriceRange);
-  //   andCondition.push({
-  //     price: {
-  //       lte: maxPrice,
-  //     },
-  //   });
   // }
 
   const whereConditions: Prisma.ProductWhereInput = {
