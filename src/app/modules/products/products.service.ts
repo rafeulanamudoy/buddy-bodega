@@ -61,7 +61,8 @@ const getProducts = async (
 
   const { query, ...filtersData } = filters;
   console.log(filtersData, "check filters data");
-  
+  let finalLimit = limit; // Using limit as received from paginationHelpers
+  let sortCondition: { [key: string]: Prisma.SortOrder } = {};
   const andCondition: Prisma.ProductWhereInput[] = [];
 
   if (query) {
@@ -86,46 +87,53 @@ const getProducts = async (
     });
   }
 
-  if(filtersData.sale){
-    console.log("check sale")
+  if (filtersData.sale) {
+    console.log("check sale");
     andCondition.push({
-      OR:[
-
+      OR: [
         {
-          discountPrice:{
-            gt:0
-          }
-        }
-      ]
-    })
+          discountPrice: {
+            gt: 0,
+          },
+        },
+      ],
+    });
   }
+
+  if (filtersData.newProduct) {
+    console.log("check newProduct");
+    // Limit to 10 results when filtering by newProduct
+    finalLimit = 20;
+
+    // Sort by latest createdAt
+    // sortCondition['createdAt'] = Prisma.SortOrder.asc;
+  }
+
   if (filtersData.category) {
     andCondition.push({
       category: {
         is: {
-          categoryName: filtersData.category, // Assuming the `Category` model has a `name` field
+          categoryName: filtersData.category,
         },
       },
     });
   }
 
-  // }
-
-  const whereConditions: Prisma.ProductWhereInput = {
-    AND: andCondition.length > 0 ? andCondition : undefined,
-  };
-
-  const sortCondition: { [key: string]: Prisma.SortOrder } = {};
+  // Ensure sortCondition is defined and assigned
   if (sortBy && sortOrder) {
     sortCondition[sortBy] =
       sortOrder === "asc" ? Prisma.SortOrder.asc : Prisma.SortOrder.desc;
   }
 
+  const whereConditions: Prisma.ProductWhereInput = {
+    AND: andCondition.length > 0 ? andCondition : undefined,
+  };
+
   const result = await prisma.product.findMany({
     where: whereConditions,
     orderBy: sortCondition,
     skip: skip,
-    take: limit,
+    take: finalLimit, // Using updated finalLimit
     include: { category: true },
   });
 
@@ -136,7 +144,7 @@ const getProducts = async (
   return {
     meta: {
       page,
-      limit,
+      limit: finalLimit,
       count,
     },
     data: result,
