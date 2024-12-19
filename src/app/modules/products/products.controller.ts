@@ -43,13 +43,14 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
       data: result,
     });
   });
-  const getProducts = catchAsync(async (req: Request, res: Response) => {
+  const getProducts = catchAsync(async (req: any, res: Response) => {
     // console.log(req.user, "check reconst paginationOptions = pick(req.query, paginationFileds);
     const paginationOptions = pick(req.query, paginationFileds);
   // console.log(req.query, "querty check from controller");
   const filters = pick(req.query, filterableField)
+  console.log(req.user,"check user")
   
-    const result = await productService.getProducts(filters,paginationOptions);
+    const result = await productService.getProducts(req.user,filters,paginationOptions);
     sendResponse(res, {
       success: true,
       statusCode: httpStatus.OK,

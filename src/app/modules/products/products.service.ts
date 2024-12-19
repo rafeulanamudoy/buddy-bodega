@@ -1,4 +1,4 @@
-import { Prisma, Product } from "@prisma/client";
+import { Prisma, Product, User, UserRole } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
@@ -53,6 +53,7 @@ const getSingleProduct = async (id: string) => {
 };
 
 const getProducts = async (
+  user: User,
   filters: any,
   paginationOptions: IpaginationOptions
 ): Promise<IGenericResponse<Product[]>> => {
@@ -60,11 +61,39 @@ const getProducts = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   const { query, ...filtersData } = filters;
-  console.log(filtersData, "check filters data");
+  // console.log(filtersData, "check filters data");
   let finalLimit = limit; // Using limit as received from paginationHelpers
   let sortCondition: { [key: string]: Prisma.SortOrder } = {};
   const andCondition: Prisma.ProductWhereInput[] = [];
+  console.log(user.id, "check id");
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      id: user.id,
+    },
+    include: {
+      customer: {
+        select: {
+          differentCategories: true,
+        },
+      },
+    },
+  });
+  console.log(
+    existingUser?.customer?.differentCategories,
+    "data for user check"
+  );
+  if (user.role === UserRole.USER && existingUser && existingUser.customer && !existingUser.customer.differentCategories.includes("ALL")) {
 
+    andCondition.push({
+      OR: existingUser.customer.differentCategories.map(category => ({
+        category: {
+          is: {
+            categoryName: category
+          }
+        }
+      }))
+    });
+  }
   if (query) {
     andCondition.push({
       OR: [
