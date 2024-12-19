@@ -1,5 +1,3 @@
-
-
 import { NextFunction, Request, Response } from "express";
 
 export const parseBodyData = (
@@ -8,6 +6,7 @@ export const parseBodyData = (
   next: NextFunction
 ) => {
   if (req.body.data) {
+    console.log(req.body.data,"check datya")
     try {
       req.body = JSON.parse(req.body.data);
     } catch (error) {

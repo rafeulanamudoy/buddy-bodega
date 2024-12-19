@@ -1,4 +1,4 @@
-import { Brand, Category } from "@prisma/client";
+import { Category } from "@prisma/client";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
@@ -39,7 +39,7 @@ const deleteSingleCategory = async (id: string) => {
   if (!isExist) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "category  not exist ");
   }
-  const result = await prisma.brand.delete({
+  const result = await prisma.category.delete({
     where: {
       id: id,
     },
@@ -57,7 +57,7 @@ const updateSingleCategories = async (id: string, payload: Category) => {
   if (!isExist) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "category not exist ");
   }
-  const result = await prisma.brand.update({
+  const result = await prisma.category.update({
     where: {
       id: id,
     },

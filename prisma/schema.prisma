@@ -85,19 +85,23 @@ model Admin {
 // Product model
 model Product {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
+  name          String        @unique
   mainPrice     Float
-  discountPrice Float         @default(0)
+  productImage   String
+  discountPrice Float?        @default(0)
   status        ProductStatus @default(ACTIVE)
   details       String
   categoryId    String        @db.ObjectId
-  brandId       String?       @db.ObjectId
   category      Category      @relation(fields: [categoryId], references: [id])
-  brand         Brand?        @relation(fields: [brandId], references: [id])
-  reviews       ReviewModel[]
-  carts         CartModel[]
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  brandName     String
+  // brandId       String?       @db.ObjectId
+
+  // brand         Brand?        @relation(fields: [brandId], references: [id])
+
+  reviews   ReviewModel[]
+  carts     CartModel[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@map("products")
 }
@@ -105,7 +109,7 @@ model Product {
 // Category model
 model Category {
   id           String    @id @default(auto()) @map("_id") @db.ObjectId
-  categoryName String  @unique
+  categoryName String    @unique
   products     Product[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -114,16 +118,16 @@ model Category {
 }
 
 // Brand model
-model Brand {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
-  brandName  String @unique
-  brandImage String
-  products   Product[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+// model Brand {
+//   id         String    @id @default(auto()) @map("_id") @db.ObjectId
+//   brandName  String @unique
+//   brandImage String
+//   products   Product[]
+//   createdAt  DateTime  @default(now())
+//   updatedAt  DateTime  @updatedAt
 
-  @@map("brands")
-}
+//   @@map("brands")
+// }
 
 // CartModel (Tracks items added to a user's cart)
 model CartModel {
@@ -239,6 +243,10 @@ model Coupon {
 
   @@map("coupons")
 }
+
+// enum BrandName {
+//   Flamez
+// }
 
 enum CouponDiscountType {
   PERCENTAGE

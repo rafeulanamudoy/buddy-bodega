@@ -2,8 +2,9 @@ import express from "express";
 import { userRoutes } from "../modules/user/user.route";
 import { authRoute } from "../modules/auth/auth.routes";
 import { customerRoute } from "../modules/customer/customer.route";
-import { brandRoute } from "../modules/brands/brands.route";
+// import { brandRoute } from "../modules/brands/brands.route";
 import { categoryRoute } from "../modules/categories/categories.route";
+import { productRoute } from "../modules/products/products.route";
 
 const router = express.Router();
 
@@ -21,13 +22,17 @@ const moduleRoutes = [
     path: "/customer",
     route: customerRoute,
   },
-  {
-    path: "/brand",
-    route: brandRoute,
-  },
+  // {
+  //   path: "/brand",
+  //   route: brandRoute,
+  // },
   {
     path: "/category",
     route: categoryRoute,
+  },
+  {
+    path: "/product",
+    route: productRoute,
   },
 ];
 
