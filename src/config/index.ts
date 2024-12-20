@@ -14,14 +14,14 @@ export default {
     clientId: process.env.STRIPE_CLIENT_ID,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
   },
-  
-  
+
   paypal: {
     clientId: process.env.PAYPAL_CLIENT_ID,
     clientSecret: process.env.PAYPAL_CLIENT_SECRET,
-    apiUrl: process.env.NODE_ENV === 'production' 
-      ? 'https://api.paypal.com'
-      : 'https://api.sandbox.paypal.com',
+    apiUrl:
+      process.env.NODE_ENV === "production"
+        ? "https://api.paypal.com"
+        : "https://api.sandbox.paypal.com",
   },
 
   jwt: {
@@ -32,9 +32,9 @@ export default {
     reset_pass_secret: process.env.RESET_PASS_TOKEN,
     reset_pass_token_expires_in: process.env.RESET_PASS_TOKEN_EXPIRES_IN,
   },
-  
+
   reset_pass_link: process.env.RESET_PASS_LINK,
-  
+
   emailSender: {
     email: process.env.EMAIL,
     app_pass: process.env.APP_PASS,
@@ -48,7 +48,7 @@ export default {
     sslPaymentApi: process.env.SSL_PAYMENT_API,
     sslValidationApi: process.env.SSL_VALIDATIOIN_API,
   },
-    
+
   s3: {
     do_space_endpoint: process.env.DO_SPACE_ENDPOINT,
     do_space_accesskey: process.env.DO_SPACE_ACCESS_KEY,

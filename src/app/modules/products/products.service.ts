@@ -53,7 +53,7 @@ const getSingleProduct = async (id: string) => {
 };
 
 const getProducts = async (
-  user: User,
+  user: User | undefined, // User can be undefined
   filters: any,
   paginationOptions: IpaginationOptions
 ): Promise<IGenericResponse<Product[]>> => {
@@ -61,94 +61,56 @@ const getProducts = async (
     paginationHelpers.calculatePagination(paginationOptions);
 
   const { query, ...filtersData } = filters;
-  // console.log(filtersData, "check filters data");
-  let finalLimit = limit; // Using limit as received from paginationHelpers
+  let finalLimit = limit;
   let sortCondition: { [key: string]: Prisma.SortOrder } = {};
   const andCondition: Prisma.ProductWhereInput[] = [];
-  console.log(user.id, "check id");
-  const existingUser = await prisma.user.findUnique({
-    where: {
-      id: user.id,
-    },
-    include: {
-      customer: {
-        select: {
-          differentCategories: true,
-        },
-      },
-    },
-  });
-  console.log(
-    existingUser?.customer?.differentCategories,
-    "data for user check"
-  );
-  if (user.role === UserRole.USER && existingUser && existingUser.customer && !existingUser.customer.differentCategories.includes("ALL")) {
 
-    andCondition.push({
-      OR: existingUser.customer.differentCategories.map(category => ({
-        category: {
-          is: {
-            categoryName: category
-          }
-        }
-      }))
+  if (user) {
+    const existingUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        customer: { select: { differentCategories: true } },
+      },
     });
+
+    if (
+      user.role === UserRole.USER &&
+      existingUser &&
+      existingUser.customer &&
+      !existingUser.customer.differentCategories.includes("ALL")
+    ) {
+      andCondition.push({
+        OR: existingUser.customer.differentCategories.map((category) => ({
+          category: { is: { categoryName: category } },
+        })),
+      });
+    }
   }
+
   if (query) {
     andCondition.push({
-      OR: [
-        {
-          name: {
-            contains: query as string,
-            mode: "insensitive",
-          },
-        },
-      ],
+      OR: [{ name: { contains: query as string, mode: "insensitive" } }],
     });
   }
+
   if (filtersData.brand) {
-    andCondition.push({
-      OR: [
-        {
-          brandName: filtersData.brand,
-        },
-      ],
-    });
+    andCondition.push({ OR: [{ brandName: filtersData.brand }] });
   }
 
   if (filtersData.sale) {
-    console.log("check sale");
-    andCondition.push({
-      OR: [
-        {
-          discountPrice: {
-            gt: 0,
-          },
-        },
-      ],
-    });
+    andCondition.push({ OR: [{ discountPrice: { gt: 0 } }] });
   }
 
   if (filtersData.newProduct) {
-    console.log("check newProduct");
-    // Limit to 10 results when filtering by newProduct
     finalLimit = 20;
-
-    // Sort by latest createdAt
-    // sortCondition['createdAt'] = Prisma.SortOrder.asc;
   }
 
   if (filtersData.category) {
     andCondition.push({
-      category: {
-        is: {
-          categoryName: filtersData.category,
-        },
-      },
+      category: { is: { categoryName: filtersData.category } },
     });
   }
 
-  // Ensure sortCondition is defined and assigned
   if (sortBy && sortOrder) {
     sortCondition[sortBy] =
       sortOrder === "asc" ? Prisma.SortOrder.asc : Prisma.SortOrder.desc;
@@ -161,25 +123,18 @@ const getProducts = async (
   const result = await prisma.product.findMany({
     where: whereConditions,
     orderBy: sortCondition,
-    skip: skip,
-    take: finalLimit, // Using updated finalLimit
+    skip,
+    take: finalLimit,
     include: { category: true },
   });
 
-  const count = await prisma.product.count({
-    where: whereConditions,
-  });
+  const count = await prisma.product.count({ where: whereConditions });
 
   return {
-    meta: {
-      page,
-      limit: finalLimit,
-      count,
-    },
+    meta: { page, limit: finalLimit, count },
     data: result,
   };
 };
-
 export const productService = {
   createProducts,
   getSingleProduct,

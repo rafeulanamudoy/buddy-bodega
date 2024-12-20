@@ -4,23 +4,25 @@ import { UserRole } from "@prisma/client";
 import { productController } from "./products.controller";
 import { multerUpload } from "../../middlewares/multer";
 import { parseBodyData } from "../../middlewares/parseBodyData";
+import optionalAuth from "../../middlewares/optionalAuth";
 
 const router = express.Router();
 
 router.post(
   "/create-product",
   //   auth(UserRole.ADMIN),
-    multerUpload.single("productImage"),
+  multerUpload.single("productImage"),
   parseBodyData,
 
   productController.createProduct
 );
 router.get(
   "/get-all-products",
-  auth(UserRole.ADMIN, UserRole.USER),
+  // auth(UserRole.ADMIN, UserRole.USER),
+  optionalAuth(UserRole.ADMIN, UserRole.USER),
+
   productController.getProducts
 );
 router.get("/single-product/:id", productController.getSingleProduct);
-
 
 export const productRoute = router;
