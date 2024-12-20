@@ -20,7 +20,6 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("User not found");
   }
 
-
   if (!payload.password || !userData?.password) {
     throw new Error("Password is required");
   }
@@ -34,51 +33,75 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("Password incorrect!");
   }
 
-  const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
-  const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+  //   const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+  //   const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
 
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTP Verification</title>
-</head>
-<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f6f9fc; margin: 0; padding: 0; line-height: 1.6;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
-        <div style="background-color: #FF7600; background-image: linear-gradient(135deg, #FF7600, #45a049); padding: 30px 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">OTP Verification</h1>
-        </div>
-        <div style="padding: 20px 12px; text-align: center;">
-            <p style="font-size: 18px; color: #333333; margin-bottom: 10px;">Hello,</p>
-            <p style="font-size: 18px; color: #333333; margin-bottom: 20px;">Your OTP for verifying your account is:</p>
-            <p style="font-size: 36px; font-weight: bold; color: #FF7600; margin: 20px 0; padding: 10px 20px; background-color: #f0f8f0; border-radius: 8px; display: inline-block; letter-spacing: 5px;">${randomOtp}</p>
-            <p style="font-size: 16px; color: #555555; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">Please enter this OTP to complete the verification process. This OTP is valid for 5 minutes.</p>
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-                <p style="font-size: 14px; color: #888888; margin-bottom: 4px;">Thank you for choosing our service!</p>
-                <p style="font-size: 14px; color: #888888; margin-bottom: 0;">If you didn't request this OTP, please ignore this email.</p>
-            </div>
-        </div>
-        <div style="background-color: #f9f9f9; padding: 10px; text-align: center; font-size: 12px; color: #999999;">
-            <p style="margin: 0;">© 2023 Your Company Name. All rights reserved.</p>
-        </div>
-    </div>
-</body>
-</html>`;
+  //   const html = `<!DOCTYPE html>
+  // <html lang="en">
+  // <head>
+  //     <meta charset="UTF-8">
+  //     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  //     <title>OTP Verification</title>
+  // </head>
+  // <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f6f9fc; margin: 0; padding: 0; line-height: 1.6;">
+  //     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+  //         <div style="background-color: #FF7600; background-image: linear-gradient(135deg, #FF7600, #45a049); padding: 30px 20px; text-align: center;">
+  //             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">OTP Verification</h1>
+  //         </div>
+  //         <div style="padding: 20px 12px; text-align: center;">
+  //             <p style="font-size: 18px; color: #333333; margin-bottom: 10px;">Hello,</p>
+  //             <p style="font-size: 18px; color: #333333; margin-bottom: 20px;">Your OTP for verifying your account is:</p>
+  //             <p style="font-size: 36px; font-weight: bold; color: #FF7600; margin: 20px 0; padding: 10px 20px; background-color: #f0f8f0; border-radius: 8px; display: inline-block; letter-spacing: 5px;">${randomOtp}</p>
+  //             <p style="font-size: 16px; color: #555555; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">Please enter this OTP to complete the verification process. This OTP is valid for 5 minutes.</p>
+  //             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+  //                 <p style="font-size: 14px; color: #888888; margin-bottom: 4px;">Thank you for choosing our service!</p>
+  //                 <p style="font-size: 14px; color: #888888; margin-bottom: 0;">If you didn't request this OTP, please ignore this email.</p>
+  //             </div>
+  //         </div>
+  //         <div style="background-color: #f9f9f9; padding: 10px; text-align: center; font-size: 12px; color: #999999;">
+  //             <p style="margin: 0;">© 2023 Your Company Name. All rights reserved.</p>
+  //         </div>
+  //     </div>
+  // </body>
+  // </html>`;
 
-  await emailSender("OTP", userData.email, html);
+  //   await emailSender("OTP", userData.email, html);
 
-  await prisma.user.update({
-    where: {
+  //   await prisma.user.update({
+  //     where: {
+  //       id: userData.id,
+  //     },
+  //     data: {
+  //       otp: randomOtp,
+  //       otpExpiry: otpExpiry,
+  //     },
+  //   });
+  const accessToken = jwtHelpers.generateToken(
+    {
       id: userData.id,
+      email: userData.email,
+      role: userData.role,
     },
-    data: {
-      otp: randomOtp,
-      otpExpiry: otpExpiry,
-    },
-  });
+    config.jwt.jwt_secret as Secret,
+    config.jwt.expires_in as string
+  );
 
-  return randomOtp;
+  const refreshToken = jwtHelpers.generateToken(
+    {
+      id: userData.id,
+      email: userData.email,
+      role: userData.role,
+    },
+    config.jwt.refresh_token_secret as Secret,
+    config.jwt.refresh_token_expires_in as string
+  );
+
+  const result = {
+    accessToken,
+    refreshToken,
+  };
+
+  return result;
 };
 
 // user login
@@ -140,7 +163,6 @@ const enterOtp = async (payload: { otp: string; identifier: string }) => {
 };
 
 // get user profile
-
 
 // change password
 const changePassword = async (
@@ -270,7 +292,7 @@ const resetPassword = async (
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
   }
 
-  console.log(payload.password)
+  console.log(payload.password);
   // hash password
   const password = await bcrypt.hash(payload.password, 12);
 
@@ -285,7 +307,6 @@ const resetPassword = async (
   return { message: "Password reset successfully" };
 };
 
-
 export const AuthServices = {
   loginUser,
   enterOtp,
@@ -294,3 +315,74 @@ export const AuthServices = {
   forgotPassword,
   resetPassword,
 };
+
+// const loginUser = async (payload: { email: string; password: string }) => {
+//   const userData = await prisma.user.findUniqueOrThrow({
+//     where: {
+//       email: payload.email,
+//     },
+//   });
+
+//   if (!userData) {
+//     throw new Error("User not found");
+//   }
+
+//   if (!payload.password || !userData?.password) {
+//     throw new Error("Password is required");
+//   }
+
+//   const isCorrectPassword: boolean = await bcrypt.compare(
+//     payload.password,
+//     userData.password
+//   );
+
+//   if (!isCorrectPassword) {
+//     throw new Error("Password incorrect!");
+//   }
+
+//   const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+//   const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+//   const html = `<!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <title>OTP Verification</title>
+// </head>
+// <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f6f9fc; margin: 0; padding: 0; line-height: 1.6;">
+//     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+//         <div style="background-color: #FF7600; background-image: linear-gradient(135deg, #FF7600, #45a049); padding: 30px 20px; text-align: center;">
+//             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);">OTP Verification</h1>
+//         </div>
+//         <div style="padding: 20px 12px; text-align: center;">
+//             <p style="font-size: 18px; color: #333333; margin-bottom: 10px;">Hello,</p>
+//             <p style="font-size: 18px; color: #333333; margin-bottom: 20px;">Your OTP for verifying your account is:</p>
+//             <p style="font-size: 36px; font-weight: bold; color: #FF7600; margin: 20px 0; padding: 10px 20px; background-color: #f0f8f0; border-radius: 8px; display: inline-block; letter-spacing: 5px;">${randomOtp}</p>
+//             <p style="font-size: 16px; color: #555555; margin-bottom: 20px; max-width: 400px; margin-left: auto; margin-right: auto;">Please enter this OTP to complete the verification process. This OTP is valid for 5 minutes.</p>
+//             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+//                 <p style="font-size: 14px; color: #888888; margin-bottom: 4px;">Thank you for choosing our service!</p>
+//                 <p style="font-size: 14px; color: #888888; margin-bottom: 0;">If you didn't request this OTP, please ignore this email.</p>
+//             </div>
+//         </div>
+//         <div style="background-color: #f9f9f9; padding: 10px; text-align: center; font-size: 12px; color: #999999;">
+//             <p style="margin: 0;">© 2023 Your Company Name. All rights reserved.</p>
+//         </div>
+//     </div>
+// </body>
+// </html>`;
+
+//   await emailSender("OTP", userData.email, html);
+
+//   await prisma.user.update({
+//     where: {
+//       id: userData.id,
+//     },
+//     data: {
+//       otp: randomOtp,
+//       otpExpiry: otpExpiry,
+//     },
+//   });
+
+//   return randomOtp;
+// };
