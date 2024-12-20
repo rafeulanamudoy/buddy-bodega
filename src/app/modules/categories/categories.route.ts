@@ -2,6 +2,8 @@ import express from "express";
 
 import { multerUpload } from "../../middlewares/multer";
 import { categoryController } from "./categories.controller";
+import auth from "../../middlewares/auth";
+import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
@@ -9,7 +11,7 @@ const router = express.Router();
 router.post(
   "/create-category",
 
-  // auth(UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN),
   categoryController.createCategory
 );
 router.get(
@@ -21,12 +23,12 @@ router.get(
 router.patch(
   "/update-category/:id",
   multerUpload.single("brandImage"),
-  // auth(UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN),
   categoryController.updateSingleCategory
 );
 router.delete(
   "/delete-category/:id",
-  // auth(UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN),
   categoryController.deleteSingleCategory
 );
 

@@ -10,7 +10,7 @@ const router = express.Router();
 
 router.post(
   "/create-product",
-  //   auth(UserRole.ADMIN),
+  auth(UserRole.SUPER_ADMIN),
   multerUpload.single("productImage"),
   parseBodyData,
 
