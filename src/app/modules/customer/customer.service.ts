@@ -81,6 +81,10 @@ export const getSingleCustomer = async (id: string) => {
     where: {
       id: id,
     },
+    include:{
+      customer:true,
+     
+    }
    
   });
   if (!result) {

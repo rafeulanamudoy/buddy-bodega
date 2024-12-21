@@ -61,11 +61,12 @@ const getSingleCustomer = catchAsync(async (req: any, res: Response) => {
   console.log(req.user, "check req.user");
 
   const result = await customerService.getSingleCustomer(req.user.id);
+  const {password,otp,otpExpiry,createdAt,...others}=result
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Customer account get successfully.",
-    data: result,
+    data: others,
   });
 });
 const updateProfile=catchAsync(async (req: any, res: Response) => {
@@ -81,6 +82,7 @@ const updateProfile=catchAsync(async (req: any, res: Response) => {
   
   const auth={firstName,lastName,profileImage,nickName}
   const result = await customerService.updateCustomerByemail(req.user.email,customerProfile,auth);
+
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
