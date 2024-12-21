@@ -24,6 +24,7 @@ model User {
   otp          String?
   otpExpiry    DateTime?
   identifier   String?
+  customerId   String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -46,19 +47,19 @@ model Customer {
   uploadId                       String
   uploadSelfieId                 String
   review                         ReviewModel[]
-  familiarityType                FamiliarityType
+  familiarityType                FamiliarityType?
   experienceEffect               ExperienceEffect[]
   terpeneProfile                 TerpeneProfile[]
   differentCategories            INTERESTEDCATEGORIES[]
   strain                         Strain[]
   tasteFlavor                    TasteFlavor[]
-  oftenConsume                   OftenConsume
-  typicallyConsume               TypicallyConsume
-  californiaProducts             CaliforniaProducts
-  newProductsInDifferentCategory NewProductsInDifferentCategory
-  typicalProducts                TypicalProducts
-  popularProducts                PopularProducts
-  staffFavorites                 StaffFavorites
+  oftenConsume                   OftenConsume?
+  typicallyConsume               TypicallyConsume?
+  californiaProducts             CaliforniaProducts?
+  newProductsInDifferentCategory NewProductsInDifferentCategory?
+  typicalProducts                TypicalProducts?
+  popularProducts                PopularProducts?
+  staffFavorites                 StaffFavorites?
   cart                           CartModel[]
   orders                         OrderModel[]
   transactions                   TransactionModel[]
@@ -304,6 +305,7 @@ enum ExperienceEffect {
   ENERGIZED
   RELAXED
   EUPHORIC
+  NULL
 }
 
 enum TerpeneProfile {
@@ -370,6 +372,7 @@ enum TypicallyConsume {
 enum CaliforniaProducts {
   YES
   NO
+  
 }
 
 enum NewProductsInDifferentCategory {

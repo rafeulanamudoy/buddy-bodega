@@ -17,7 +17,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   if (!file) {
     throw new ApiError(httpStatus.UNAUTHORIZED, "please upload product image");
   }
-  const fileUrl = `${config.backend_base_url}/uploads/${file.filename}`;
+  const fileUrl = `${config.base_url}/uploads/${file.filename}`;
 
   // Add the fileUrl to the product payload
   const productData = {

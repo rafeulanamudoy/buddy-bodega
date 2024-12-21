@@ -73,18 +73,18 @@ const getProducts = async (
       },
     });
 
-    if (
-      user.role === UserRole.USER &&
-      existingUser &&
-      existingUser.customer &&
-      !existingUser.customer.differentCategories.includes("ALL")
-    ) {
-      andCondition.push({
-        OR: existingUser.customer.differentCategories.map((category) => ({
-          category: { is: { categoryName: category } },
-        })),
-      });
-    }
+    // if (
+    //   user.role === UserRole.USER &&
+    //   existingUser &&
+    //   existingUser.customer &&
+    //   !existingUser.customer.differentCategories.includes("ALL")
+    // ) {
+    //   andCondition.push({
+    //     OR: existingUser.customer.differentCategories.map((category) => ({
+    //       category: { is: { categoryName: category } },
+    //     })),
+    //   });
+    // }
   }
 
   if (query) {
@@ -97,18 +97,19 @@ const getProducts = async (
     andCondition.push({ OR: [{ brandName: filtersData.brand }] });
   }
 
-  if (filtersData.sale) {
+  if (filtersData.sale==="true") {
     andCondition.push({ OR: [{ discountPrice: { gt: 0 } }] });
   }
 
   if (filtersData.newProduct) {
     finalLimit = 20;
   }
-
-  if (filtersData.category) {
+  if (filtersData.category && filtersData.category.trim() !== '""') {
     andCondition.push({
-      category: { is: { categoryName: filtersData.category } },
+      category: { is: { categoryName: filtersData.category.trim() } },
     });
+  } else {
+    console.log("Category is empty or undefined, skipping category filter.");
   }
 
   if (sortBy && sortOrder) {
@@ -123,8 +124,8 @@ const getProducts = async (
   const result = await prisma.product.findMany({
     where: whereConditions,
     orderBy: sortCondition,
-    skip,
-    take: finalLimit,
+    // skip,
+    // take: finalLimit,
     include: { category: true },
   });
 

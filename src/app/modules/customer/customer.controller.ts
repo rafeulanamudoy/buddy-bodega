@@ -90,8 +90,31 @@ const updateProfile=catchAsync(async (req: any, res: Response) => {
     data: result,
   });
 });
+
+
+export const otpVerifyForcustomer=catchAsync(async (req: Request, res: Response) => {
+  
+   const email=req.body
+   console.log(req.body)
+
+
+    const result=await customerService.otpVerifyForcustomer(req.body.email)
+
+
+   console.log(result,"check result")
+  
+ 
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: " otp send succw",
+    data: result,
+  });
+});
 export const customerController = {
   createCustomer,
   getSingleCustomer,
-  updateProfile
+  updateProfile,
+  otpVerifyForcustomer
 };
