@@ -9,7 +9,7 @@ import { AuthServices } from "./auth.service";
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
   sendResponse(res, {
-    statusCode: httpStatus.CREATED,
+    statusCode: httpStatus.OK,
     success: true,
     message: "User Login successfully",
     data: result,
