@@ -2,14 +2,14 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 import bcrypt from "bcrypt";
-import { Customer, User } from "@prisma/client";
+import { Customer, User, UserStatus } from "@prisma/client";
 import emailSender from "../../../helpers/emailSender";
 
 
 
 
 
-const otpVerifyForCustomer = async (email: string) => {
+const sendOtpForCustomer = async (email: string) => {
   const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
   const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
 
@@ -45,13 +45,13 @@ const otpVerifyForCustomer = async (email: string) => {
   // Send the OTP email
   await emailSender("OTP", email, html);
 
-  // Check if an OTP already exists for the user
+
   const existingOtp = await prisma.otpModel.findUnique({
     where: { email },
   });
 
   if (existingOtp) {
-    // Update the existing OTP and expiry
+ 
     await prisma.otpModel.update({
       where: { email },
       data: {
@@ -73,31 +73,61 @@ const otpVerifyForCustomer = async (email: string) => {
   return randomOtp;
 };
 
- const createCustomer = async (payload: any) => {
-  // Fetch OTP data for the user
-  const otpData = await prisma.otpModel.findUnique({
+const verifyOtp = async (payload: any) => {
+  const existingOtp = await prisma.otpModel.findUnique({
     where: {
       email: payload.email,
     },
   });
+  console.log(existingOtp,"check existing otp")
 
-  // Check if OTP exists
-  if (!otpData) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "No OTP found for this email.");
+  if (existingOtp?.code !== payload.otp) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "wrong otp ");
   }
 
-  // Verify OTP and expiry
-  if (otpData.code !== payload.otp) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Your OTP is incorrect.");
-  }
-
-  if(otpData.otpExpiry){
-    if (new Date() > otpData.otpExpiry) {
+  if (existingOtp && existingOtp.otpExpiry) {
+    if (new Date() > existingOtp.otpExpiry) {
       throw new ApiError(httpStatus.UNAUTHORIZED, "Your OTP has expired. Please request a new one.");
     }
   }
 
-  // Validate unique constraints
+  await prisma.user.update({
+    where: {
+      email: payload.email,
+    },
+    data: {
+      status: UserStatus.ACTIVE,  // Ensure UserStatus.ACTIVE is correctly referenced
+    },
+  });
+};
+
+    
+
+
+ const createCustomer = async (payload: any) => {
+  // Fetch OTP data for the user
+  // const otpData = await prisma.otpModel.findUnique({
+  //   where: {
+  //     email: payload.email,
+  //   },
+  // });
+
+
+  // if (!otpData) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, "No OTP found for this email.");
+  // }
+
+
+  // if (otpData.code !== payload.otp) {
+  //   throw new ApiError(httpStatus.UNAUTHORIZED, "Your OTP is incorrect.");
+  // }
+
+  // if(otpData.otpExpiry){
+  //   if (new Date() > otpData.otpExpiry) {
+  //     throw new ApiError(httpStatus.UNAUTHORIZED, "Your OTP has expired. Please request a new one.");
+  //   }
+  // }
+
   const [isEmailExist, isNickNameExist] = await Promise.all([
     prisma.user.findUnique({ where: { email: payload.email } }),
     prisma.user.findUnique({ where: { nickName: payload.nickName } }),
@@ -231,5 +261,6 @@ export const customerService = {
   createCustomer,
   getSingleCustomer,
   updateCustomerByemail,
-  otpVerifyForCustomer
+ sendOtpForCustomer,
+ verifyOtp
 };

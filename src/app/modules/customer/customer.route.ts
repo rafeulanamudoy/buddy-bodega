@@ -19,5 +19,6 @@ router.get("/get-me", auth (UserRole.USER),customerController.getSingleCustomer)
 router.patch("/update-profile",auth (UserRole.USER),customerController.updateProfile)
 
 
-router.post("/otp-for-customer",customerController.otpVerifyForcustomer)
+router.post("/otp-for-customer",customerController.sendOtpForCustomer)
+router.post("/verify-otp",customerController.verifyOtp)
 export const customerRoute = router;

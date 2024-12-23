@@ -92,13 +92,13 @@ const updateProfile=catchAsync(async (req: any, res: Response) => {
 });
 
 
-export const otpVerifyForcustomer=catchAsync(async (req: Request, res: Response) => {
+export const sendOtpForCustomer=catchAsync(async (req: Request, res: Response) => {
   
-   const email=req.body
-   console.log(req.body)
+  //  const email=req.body
+  //  console.log(req.body)
 
 
-    const result=await customerService.otpVerifyForCustomer(req.body.email)
+    const result=await customerService.sendOtpForCustomer(req.body.email)
 
 
    console.log(result,"check result")
@@ -112,9 +112,31 @@ export const otpVerifyForcustomer=catchAsync(async (req: Request, res: Response)
     data: result,
   });
 });
+
+export const verifyOtp=catchAsync(async (req: Request, res: Response) => {
+  
+  //  const email=req.body
+  //  console.log(req.body)
+
+
+    const result=await customerService.verifyOtp(req.body)
+
+
+   console.log(result,"check result")
+  
+ 
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: " otp verify succssfull",
+    data: result,
+  });
+});
 export const customerController = {
   createCustomer,
   getSingleCustomer,
   updateProfile,
-  otpVerifyForcustomer
+  sendOtpForCustomer,
+  verifyOtp
 };

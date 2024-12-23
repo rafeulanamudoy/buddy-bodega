@@ -7,7 +7,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// User model (common base for both Admin and Customer roles)
+enum UserStatus {
+  ACTIVE
+  PENDING
+}
+
 model User {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   nickName     String     @unique
@@ -19,7 +23,7 @@ model User {
   role         UserRole   @default(USER)
   customer     Customer?
   admin        Admin?
-  status       UserStatus @default(ACTIVE)
+  status       UserStatus @default(PENDING) // Valid default value
   profileImage String?
   otp          String?
   otpExpiry    DateTime?
@@ -31,7 +35,6 @@ model User {
 
   @@map("users")
 }
-
 model OtpModel {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String    @unique
@@ -70,7 +73,7 @@ model Customer {
   cart                           CartModel[]
   orders                         OrderModel[]
   transactions                   TransactionModel[]
-  invoice                        Invoice[]
+  // invoice                        Invoice[]
   createdAt                      DateTime                        @default(now())
   updatedAt                      DateTime                        @updatedAt
 
@@ -166,7 +169,7 @@ model OrderModel {
   transactions TransactionModel[]
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
-  Invoice      Invoice[]
+  // Invoice      Invoice[]
 
   @@map("orders")
 }
@@ -199,7 +202,7 @@ model BillingAddress {
   zipCode   String
   address   String
 
-  Invoice   Invoice[]
+  // Invoice   Invoice[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -221,21 +224,21 @@ model ReviewModel {
   @@map("reviews")
 }
 
-model Invoice {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
-  orderId          String          @db.ObjectId
-  order            OrderModel      @relation(fields: [orderId], references: [id])
-  customerId       String          @db.ObjectId
-  customer         Customer        @relation(fields: [customerId], references: [id])
-  invoiceNumber    String          @unique
-  billingAddressId String?         @db.ObjectId
-  billingAddress   BillingAddress? @relation(fields: [billingAddressId], references: [id])
-  amount           Float
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+// model Invoice {
+//   id               String          @id @default(auto()) @map("_id") @db.ObjectId
+//   orderId          String          @db.ObjectId
+//   order            OrderModel      @relation(fields: [orderId], references: [id])
+//   customerId       String          @db.ObjectId
+//   customer         Customer        @relation(fields: [customerId], references: [id])
+//   invoiceNumber    String          @unique
+//   billingAddressId String?         @db.ObjectId
+//   billingAddress   BillingAddress? @relation(fields: [billingAddressId], references: [id])
+//   amount           Float
+//   createdAt        DateTime        @default(now())
+//   updatedAt        DateTime        @updatedAt
 
-  @@map("invoices")
-}
+//   @@map("invoices")
+// }
 
 model Coupon {
   id             String             @id @default(auto()) @map("_id") @db.ObjectId
@@ -275,11 +278,7 @@ enum CouponStatus {
   INACTIVE
 }
 
-enum UserStatus {
-  ACTIVE
-  BLOCKED
-  DELETED
-}
+
 
 enum UserRole {
   ADMIN
