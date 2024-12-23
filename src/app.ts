@@ -7,6 +7,7 @@ import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
 import Stripe from "stripe"; // Import Stripe
+import { StripeController } from "./app/modules/stripe/stripe.controller";
 const app: Application = express();
 const prisma = new PrismaClient();
 
@@ -23,12 +24,15 @@ prisma
     console.error("Failed to connect to the database:", error);
   });
 
-app.use(
-  cors({
-    origin: "http://localhost:3000", // Replace with your frontend's URL
-    credentials: true, // Allow cookies if needed
-  })
-);
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"], // Allowed methods
+      allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Allowed headers
+    })
+  );
+  
 
 // Optional: Handle preflight requests for custom headers or methods
 // app.options("*", cors());
@@ -41,6 +45,7 @@ app.use(
 //   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 //   next();
 // });
+app.post("/api/v1/stripe/payment-webhook",  express.raw({ type: "application/json" }),StripeController.saveTransactionBillingAndOrder)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));

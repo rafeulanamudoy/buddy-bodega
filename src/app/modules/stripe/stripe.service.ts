@@ -8,79 +8,42 @@ const stripe = new Stripe(config.stripe.secretKey as string, {
 });
 
 const createPayment = async (data: {
-    paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
-    currency: string;
-  
-    successUrl: string;
-    cancelUrl: string;
-    product: any;
-    userId:string
-  }) => {
-    // Create Stripe checkout session
-    const lineItems = data.product.map((product: any) => ({
-      price_data: {
-        currency: data.currency,
-        product_data: {
-          name: product.name,
-        },
-        unit_amount: product.mainPrice * 100,
+  paymentMethodTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[];
+  currency: string;
+  successUrl: string;
+  cancelUrl: string;
+  product: any;
+
+  billingAddress: any; // Adjusted type to accept valid values for billing_address_collection
+}) => {
+  // Create Stripe checkout session
+  const lineItems = data.product.map((product: any) => ({
+    price_data: {
+      currency: data.currency,
+      product_data: {
+        name: product.name,
       },
-      quantity: product.quantity,
-    }));
+      unit_amount: product.mainPrice * 100,
+    },
+    quantity: product.quantity,
+  }));
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: data.paymentMethodTypes,
+    line_items: lineItems,
+    mode: "payment",
+    success_url: data.successUrl,
+    cancel_url: data.cancelUrl,
   
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: data.paymentMethodTypes,
-      line_items: lineItems,
-      
-      mode: "payment",
-      success_url: data.successUrl,
-      cancel_url: data.cancelUrl,
-      client_reference_id:data.userId
-    });
-  
-    return session;
-  };
+    billing_address_collection:data.billingAddress
+
+  });
+
+  return session;
+};
 
 
-  // const saveTransactionBillingAndOrder = async (
-  //   userId: string,
-  //   sessionId: string,
-  //   customer:Stripe
-  //   billingAddress:BillingAddress,
-  //   transaction:any
-  //   totalAmount: number,
-  //   paymentStatus: string,
-    
-  // ) => {
-  //   // Save billing address
-  //   const savedBillingAddress = await prisma.billingAddress.create({
-  //     data: {
-  //      ...billingAddress
-  //     },
-  //   });
-  
-  //   // Save order
-  //   const savedOrder = await prisma.orderModel.create({
-  //     data: {
-  //       userId,
-  //       sessionId,
-  //       products: ["Sample Product"], // Replace with actual product details if available
-  //       totalAmount,
-  //       status: "Pending", // You can update this based on your business logic
-  //       createdAt: new Date(),
-  //     },
-  //   });
-  
-  //   // Save transaction
-  //   const savedTransaction = await prisma.transactionModel.create({
-  //     data: {
-  //      amount:totalAmount,
-  //      paymentMethod:
-  //     },
-  //   });
-  
-  //   return { billingAddress: savedBillingAddress, order: savedOrder, transaction: savedTransaction };
-  // };
+ 
   
 export const stripeService = {
   createPayment,

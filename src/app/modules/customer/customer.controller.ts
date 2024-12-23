@@ -11,27 +11,27 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
   const data = req.body;
   const files = req.files as Express.Multer.File[];
 
-  if (!files || files.length === 0) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "No files uploaded.");
-  }
+  // if (!files || files.length === 0) {
+  //   throw new ApiError(httpStatus.BAD_REQUEST, "No files uploaded.");
+  // }
 
-  console.log(files,"check file")
-  const fileMap: { [key: string]: Express.Multer.File } = {};
-  files.forEach((file) => {
-    fileMap[file.fieldname] = file;
-  });
+  // console.log(files,"check file")
+  // const fileMap: { [key: string]: Express.Multer.File } = {};
+  // files.forEach((file) => {
+  //   fileMap[file.fieldname] = file;
+  // });
 
 
-console.log(fileMap,"check filemap")
+// console.log(fileMap,"check filemap")
 
-  if (!req.files) {
-    throw new ApiError(
-      httpStatus.BAD_REQUEST,
-      "Both 'uploadId' and 'uploadSelfieId' files are required."
-    );
-  }
-    const uploadIdFile = `${config.backend_base_url}/uploads/${files[0].filename}`;
-    const uploadSelfieIdFile = `${config.backend_base_url}/uploads/${files[1].filename}`;
+  // if (!req.files) {
+  //   throw new ApiError(
+  //     httpStatus.BAD_REQUEST,
+  //     "Both 'uploadId' and 'uploadSelfieId' files are required."
+  //   );
+  // }
+  //   const uploadIdFile = `${config.backend_base_url}/uploads/${files[0].filename}`;
+  //   const uploadSelfieIdFile = `${config.backend_base_url}/uploads/${files[1].filename}`;
   // Upload files asynchronously
   // const [uploadIdUrl, uploadSelfieIdUrl] = await Promise.all([
   //   uploadFileToSpace(uploadIdFile, "customerUploadedIdFile"),
@@ -41,8 +41,8 @@ console.log(fileMap,"check filemap")
   // console.log(uploadIdUrl,"check url")
   const customerProfileData = {
     ...data,
-    uploadId: uploadIdFile,
-    uploadSelfieId: uploadSelfieIdFile,
+    // uploadId: uploadIdFile,
+    // uploadSelfieId: uploadSelfieIdFile,
   };
 
   // Call service to create the customer
