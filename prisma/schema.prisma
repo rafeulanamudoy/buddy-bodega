@@ -54,8 +54,8 @@ model Customer {
   zipCode                        String
   socialMediaType                String
   socialMediaName                String
-  uploadId                       String
-  uploadSelfieId                 String
+  uploadId                       String?
+  uploadSelfieId                 String?
   review                         ReviewModel[]
   familiarityType                FamiliarityType?
   experienceEffect               ExperienceEffect[]
