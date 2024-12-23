@@ -48,7 +48,7 @@ console.log(fileMap,"check filemap")
   // Call service to create the customer
   const result = await customerService.createCustomer(customerProfileData);
 
-  const { otp, otpExpiry, identifier, password, createdAt, ...others } = result;
+  const { identifier, password, createdAt, ...others } = result;
 
   sendResponse(res, {
     success: true,
@@ -90,8 +90,31 @@ const updateProfile=catchAsync(async (req: any, res: Response) => {
     data: result,
   });
 });
+
+
+export const otpVerifyForcustomer=catchAsync(async (req: Request, res: Response) => {
+  
+   const email=req.body
+   console.log(req.body)
+
+
+    const result=await customerService.otpVerifyForCustomer(req.body.email)
+
+
+   console.log(result,"check result")
+  
+ 
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: " otp send succw",
+    data: result,
+  });
+});
 export const customerController = {
   createCustomer,
   getSingleCustomer,
-  updateProfile
+  updateProfile,
+  otpVerifyForcustomer
 };

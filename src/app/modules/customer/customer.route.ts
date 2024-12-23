@@ -18,4 +18,6 @@ parseBodyData,customerController.createCustomer);
 router.get("/get-me", auth (UserRole.USER),customerController.getSingleCustomer)
 router.patch("/update-profile",auth (UserRole.USER),customerController.updateProfile)
 
+
+router.post("/otp-for-customer",customerController.otpVerifyForcustomer)
 export const customerRoute = router;

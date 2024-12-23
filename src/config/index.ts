@@ -7,6 +7,7 @@ export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   backend_base_url: process.env.BACKEND_BASE_URL,
+  base_url:process.env.BASE_URL,
   // Payment configurations
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,

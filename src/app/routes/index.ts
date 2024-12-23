@@ -6,6 +6,8 @@ import { customerRoute } from "../modules/customer/customer.route";
 import { categoryRoute } from "../modules/categories/categories.route";
 import { productRoute } from "../modules/products/products.route";
 import { cartRoute } from "../modules/cart/cart.route";
+import { StripeRoutes } from "../modules/stripe/stripe.route";
+// import { StripeRoutes } from "../modules/stripe/stripe.route";
 
 const router = express.Router();
 
@@ -37,6 +39,10 @@ const moduleRoutes = [
   },{
     path:"/cart",
     route:cartRoute
+  },
+  {
+    path:"/stripe",
+    route:StripeRoutes
   }
 ];
 
