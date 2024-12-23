@@ -201,6 +201,7 @@ model BillingAddress {
   state     String
   zipCode   String
   address   String
+  phoneNumber String
 
   // Invoice   Invoice[]
   createdAt DateTime  @default(now())

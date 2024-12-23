@@ -42,50 +42,47 @@ const createPayment = async (data: {
   };
 
 
-  const saveTransactionBillingAndOrder = async (
-    userId: string,
-    sessionId: string,
-    billingAddress: { name: string; email: string; address: Stripe.Address; },
-    totalAmount: number,
-    paymentStatus: string
-  ) => {
-    // Save billing address
-    const savedBillingAddress = await prisma.billingAddress.create({
-      data: {
-      
-        name: billingAddress.name,
-        email: billingAddress.email,
-        address: JSON.stringify(billingAddress.address),
-      },
-    });
+  // const saveTransactionBillingAndOrder = async (
+  //   userId: string,
+  //   sessionId: string,
+  //   customer:Stripe
+  //   billingAddress:BillingAddress,
+  //   transaction:any
+  //   totalAmount: number,
+  //   paymentStatus: string,
+    
+  // ) => {
+  //   // Save billing address
+  //   const savedBillingAddress = await prisma.billingAddress.create({
+  //     data: {
+  //      ...billingAddress
+  //     },
+  //   });
   
-    // Save order
-    const savedOrder = await prisma.orderModel.create({
-      data: {
-        userId,
-        sessionId,
-        products: ["Sample Product"], // Replace with actual product details if available
-        totalAmount,
-        status: "Pending", // You can update this based on your business logic
-        createdAt: new Date(),
-      },
-    });
+  //   // Save order
+  //   const savedOrder = await prisma.orderModel.create({
+  //     data: {
+  //       userId,
+  //       sessionId,
+  //       products: ["Sample Product"], // Replace with actual product details if available
+  //       totalAmount,
+  //       status: "Pending", // You can update this based on your business logic
+  //       createdAt: new Date(),
+  //     },
+  //   });
   
-    // Save transaction
-    const savedTransaction = await prisma.transactionModel.create({
-      data: {
-        userId,
-        sessionId,
-        amount: totalAmount,
-        paymentStatus,
-        createdAt: new Date(),
-      },
-    });
+  //   // Save transaction
+  //   const savedTransaction = await prisma.transactionModel.create({
+  //     data: {
+  //      amount:totalAmount,
+  //      paymentMethod:
+  //     },
+  //   });
   
-    return { billingAddress: savedBillingAddress, order: savedOrder, transaction: savedTransaction };
-  };
+  //   return { billingAddress: savedBillingAddress, order: savedOrder, transaction: savedTransaction };
+  // };
   
 export const stripeService = {
   createPayment,
-  saveTransactionBillingAndOrder,
+  // saveTransactionBillingAndOrder,
 };
