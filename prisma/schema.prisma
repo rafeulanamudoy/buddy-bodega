@@ -381,6 +381,7 @@ enum TypicallyConsume {
 enum CaliforniaProducts {
   YES
   NO
+  
 }
 
 enum NewProductsInDifferentCategory {

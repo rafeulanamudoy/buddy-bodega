@@ -163,6 +163,7 @@ export const getSingleCustomer = async (id: string) => {
     include: {
       customer: true,
     },
+  
   });
   if (!result) {
     throw new ApiError(httpStatus.NOT_FOUND, "Customer Account  not found!");
@@ -174,6 +175,7 @@ export const updateCustomerByemail = async (
   email: string,
   customer: Partial<Customer>,
   user: Partial<User>
+ 
 ) => {
   const currentUser = await prisma.user.findUnique({
     where: {
