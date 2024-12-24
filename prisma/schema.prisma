@@ -161,7 +161,9 @@ model OrderModel {
   id           String             @id @default(auto()) @map("_id") @db.ObjectId
   customerId   String             @db.ObjectId
   customer     Customer           @relation(fields: [customerId], references: [id])
-  products     Json // List of products with quantities
+  products     Json 
+
+  
   totalAmount  Float
   status       OrderStatus        @default(PENDING)
   couponId     String?            @db.ObjectId

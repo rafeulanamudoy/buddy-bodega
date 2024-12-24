@@ -18,6 +18,9 @@ const getOrdersByCustomer = async (id: string) => {
     where: {
       customerId: user?.customer?.id,
     },
+    select:{
+      products:true
+    }
   });
   return result;
 };
