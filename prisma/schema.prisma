@@ -181,10 +181,10 @@ model TransactionModel {
   orderId         String     @db.ObjectId
   customer        Customer   @relation(fields: [customerId], references: [id])
   order           OrderModel @relation(fields: [orderId], references: [id])
-  transactionId   String     @unique // Payment gateway's ID
+ 
   amount          Float
   paymentMethod   String
-  recipient       String
+  // recipient       String
   transactionDate DateTime   @default(now())
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt

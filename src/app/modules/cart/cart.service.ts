@@ -4,7 +4,7 @@ import ApiError from "../../errors/ApiErrors";
 import httpStatus from "http-status";
 
 const createCart = async (payload: CartModel) => {
-  const customer = await prisma.customer.findUnique({
+  const customer = await prisma.user.findUnique({
     where: {
       id: payload.customerId,
     },
@@ -12,13 +12,21 @@ const createCart = async (payload: CartModel) => {
   if (!customer) {
     throw new ApiError(400, "customer not found");
   }
-  const result = await prisma.cartModel.create({
-    data: {
-      ...payload,
+  const findCustomer = await prisma.customer.findUnique({
+    where: {
+      email: customer.email,
     },
   });
-
-  return result;
+  if (findCustomer) {
+    const result = await prisma.cartModel.create({
+      data: {
+        quantity: payload.quantity,
+        customerId: findCustomer?.id,
+        productId: payload.productId,
+      },
+    });
+    return result;
+  }
 };
 
 export const updateCart = async (id: string, payload: Partial<CartModel>) => {
@@ -79,7 +87,11 @@ export const getCartByCustomer = async (id: string) => {
       id: user.customer.id, // Extract and pass the `id` as a string
     },
     include: {
-      cart: true, // Includes the cart data
+      cart: {
+        select:{
+          product:true
+        }
+      }, // Includes the cart data
     },
   });
 

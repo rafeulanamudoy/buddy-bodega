@@ -10,7 +10,7 @@ const router = express.Router();
 router.post(
   "/create-payment",
 
-  validateRequest(AuthorizedPaymentPayloadSchema), // Validate request payload
+  // validateRequest(AuthorizedPaymentPayloadSchema), // Validate request payload
   StripeController.createPayment
 );
 

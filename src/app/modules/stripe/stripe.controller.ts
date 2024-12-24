@@ -11,7 +11,7 @@ const stripe = new Stripe(config.stripe.secretKey as string, {
 
 // Create a new payment session
 const createPayment = catchAsync(async (req: Request, res: Response) => {
-  const { customer, paymentMethodTypes, currency, successUrl, cancelUrl,product ,billingAddress} = req.body;
+  const { customerEmail, paymentMethodTypes, currency, successUrl, cancelUrl,product ,billing_address_collection, client_reference_id} = req.body;
 
   // Step 1: Create a payment session
   const session = await stripeService.createPayment({
@@ -22,12 +22,13 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
     cancelUrl,
     product,
 
-    billingAddress,
+    billing_address_collection,
+    customerEmail,
+    client_reference_id,
    
   });
 
-  // Step 2: Save transaction and order history
-  // const { transaction, order } = await stripeService.saveTransactionBillingAndOrder(userId, session.id,billingAddress,totalAmount,paymentStatus);
+
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -36,7 +37,7 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
     data: session
   });
 });
-const saveTransactionBillingAndOrder=catchAsync(async (req: Request, res: Response) => {
+const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
  
   if (!sig) {
@@ -49,50 +50,58 @@ const saveTransactionBillingAndOrder=catchAsync(async (req: Request, res: Respon
   }
 
   let event: Stripe.Event;
-console.log(config.stripe.webhookSecret,"check secret key")
+
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, config.stripe.webhookSecret as string);
-    console.log(event.type,"check event")
   } catch (err) {
     console.error("Webhook signature verification failed.", err);
     return res.status(400).send("Webhook Error");
   }
  
-  // Handle the event
+
   switch (event.type) {
     case "checkout.session.completed":
       const session = event.data.object as Stripe.Checkout.Session;
-      console.log(session,"check session")
-
-      // Extract necessary information
-      const userId = session.client_reference_id; // Sent during session creation
-      const sessionId = session.id;
-      const customerId = session.customer as string; // Stripe Customer ID
-      const totalAmount = session.amount_total; // Total amount paid
-      const paymentStatus = session.payment_status;
-
       try {
-
-        const customer = await stripe.customers.retrieve(customerId);
-        return
-
-        // 2. Save transaction, order, and billing information
-        // await stripeService.saveTransactionBillingAndOrder(
-        //   userId,
-        //   sessionId,
-        //   customer,
-        //   totalAmount,
-        //   paymentStatus
-
-        // );
+        const result = await stripeService.saveTransactionBillingAndOrder(session);
+        return result;
       } catch (error) {
         console.error("Error saving transaction:", error);
         return res.status(500).send("Internal Server Error");
       }
-
       break;
 
-    // Handle other event types...
+    case "payment_intent.succeeded":
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      try {
+        console.log('PaymentIntent succeeded:', paymentIntent.id);
+      } catch (error) {
+        console.error("Error handling payment_intent.succeeded:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+      break;
+
+    case "payment_intent.created":
+      const createdPaymentIntent = event.data.object as Stripe.PaymentIntent;
+      try {
+        console.log('PaymentIntent created:', createdPaymentIntent.id);
+      } catch (error) {
+        console.error("Error handling payment_intent.created:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+      break;
+
+    case "charge.updated":
+      const updatedCharge = event.data.object as Stripe.Charge;
+      try {
+        console.log('Charge updated:', updatedCharge.id);
+      
+      } catch (error) {
+        console.error("Error handling charge.updated:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+      break;
+
     default:
       console.warn(`Unhandled event type ${event.type}`);
   }

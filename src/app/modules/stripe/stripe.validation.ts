@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const AuthorizedPaymentPayloadSchema = z.object({
-  customer: z.string(),
+  custmerEmail: z.string(),
   paymentMethodTypes: z.array(z.string()),
   currency: z.string().length(3), // e.g., "usd"
   // amount: z.number().positive(),
