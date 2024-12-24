@@ -1,6 +1,7 @@
-import { cashInController } from "./cashincontroller";
+
 
  import express from "express"
+import { cashInController } from "./cashInController";
 const router = express.Router();
 
 
