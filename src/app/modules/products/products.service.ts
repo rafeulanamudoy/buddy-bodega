@@ -8,7 +8,7 @@ import { IGenericResponse } from "../../../helpers/general";
 import { paginationHelpers } from "../../../helpers/paginationHelper";
 
 export const createProducts = async (payload: Product) => {
-  console.log(payload, "check payload");
+  // console.log(payload, "check payload");
   const isExist = await prisma.product.findUnique({
     where: {
       name: payload.name.trim().toUpperCase(),

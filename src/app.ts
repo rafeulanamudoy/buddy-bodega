@@ -26,12 +26,28 @@ prisma
 
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: ["http://localhost:3000"],
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"], // Allowed methods
       allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"], // Allowed headers
     })
   );
+
+  export const corsOptions = {
+    origin: [
+      // "https://tasneem-social-frontend.netlify.app",
+      "http://localhost:3000",
+      "http://192.168.11.130:3000",
+      "https://rayaa-social.vercel.app",
+      "https://tasneem-social-frontend.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  };
+  
+  // Middleware setup
+  app.use(cors(corsOptions));
   
 
 // Optional: Handle preflight requests for custom headers or methods
@@ -47,7 +63,7 @@ prisma
 // });
 app.post("/api/v1/stripe/payment-webhook",  express.raw({ type: "application/json" }),StripeController.saveTransactionBillingAndOrder)
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 // Route handler for root endpoint

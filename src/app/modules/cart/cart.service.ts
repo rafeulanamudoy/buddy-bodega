@@ -86,13 +86,10 @@ export const getCartByCustomer = async (id: string) => {
     where: {
       id: user.customer.id, // Extract and pass the `id` as a string
     },
-    include: {
-      cart: {
-        select:{
-          product:true
-        }
-      }, // Includes the cart data
-    },
+    select:{
+      cart:true
+    }
+   
   });
 
   if (!result) {

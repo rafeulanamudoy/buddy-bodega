@@ -62,9 +62,9 @@ const createPayment = async (data: {
 
 const saveTransactionBillingAndOrder = async (session:any) => {
   try {
-   console.log(session,"check session")
+  //  console.log(session,"check session")
 
-    console.log(session.client_reference_id,"check client reference id")
+    // console.log(session.client_reference_id,"check client reference id")
     const findCustomer=await prisma.user.findUnique({
       where:{
         id:session.client_reference_id
@@ -73,7 +73,7 @@ const saveTransactionBillingAndOrder = async (session:any) => {
       }
     })
 
-    console.log(findCustomer,"check findcustomer")
+    // console.log(findCustomer,"check findcustomer")
     if(!findCustomer || !findCustomer.customer  ){
       throw new ApiError(httpStatus.UNAUTHORIZED,"customer not found")
     }
@@ -82,8 +82,8 @@ const saveTransactionBillingAndOrder = async (session:any) => {
 
    const product=JSON.parse(session.metadata.customer_product)
 
-   console.log(customer_billing_address,"check customer billing address")
-   console.log(product,"check product ")
+  //  console.log(customer_billing_address,"check customer billing address")
+  //  console.log(product,"check product ")
       
 
       const order = await prisma.orderModel.create({
@@ -95,7 +95,7 @@ const saveTransactionBillingAndOrder = async (session:any) => {
           },
       });
 
-       console.log(session.id,"check session id")
+      //  console.log(session.id,"check session id")
       const transaction = await prisma.transactionModel.create({
           data: {
               customerId: findCustomer.customer.id,
@@ -112,9 +112,9 @@ const saveTransactionBillingAndOrder = async (session:any) => {
         }
       })
       let deleteMany
-      console.log(findCustomer.customer.id,"customer id")
+      // console.log(findCustomer.customer.id,"customer id")
       if (findCustomer.customer.id ) {
-        console.log(findCustomer.customer.id)
+        // console.log(findCustomer.customer.id)
        deleteMany=  await prisma.cartModel.deleteMany({
           where: {
             customerId: findCustomer.customer.id,
@@ -123,7 +123,7 @@ const saveTransactionBillingAndOrder = async (session:any) => {
       }
 
 
-console.log(deleteMany,"check ")
+// console.log(deleteMany,"check ")
     
 
       return {
@@ -133,7 +133,7 @@ console.log(deleteMany,"check ")
           billingAddress
       };
   } catch (error) {
-      console.error('Error saving transaction and order:', error);
+      // console.error('Error saving transaction and order:', error);
       throw new Error('Error saving transaction and order.');
   }
 };

@@ -74,9 +74,9 @@ const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Resp
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       try {
-        console.log('PaymentIntent succeeded:', paymentIntent.id);
+        // console.log('PaymentIntent succeeded:', paymentIntent.id);
       } catch (error) {
-        console.error("Error handling payment_intent.succeeded:", error);
+        // console.error("Error handling payment_intent.succeeded:", error);
         return res.status(500).send("Internal Server Error");
       }
       break;
@@ -84,7 +84,7 @@ const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Resp
     case "payment_intent.created":
       const createdPaymentIntent = event.data.object as Stripe.PaymentIntent;
       try {
-        console.log('PaymentIntent created:', createdPaymentIntent.id);
+        // console.log('PaymentIntent created:', createdPaymentIntent.id);
       } catch (error) {
         console.error("Error handling payment_intent.created:", error);
         return res.status(500).send("Internal Server Error");
@@ -94,16 +94,16 @@ const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Resp
     case "charge.updated":
       const updatedCharge = event.data.object as Stripe.Charge;
       try {
-        console.log('Charge updated:', updatedCharge.id);
+        // console.log('Charge updated:', updatedCharge.id);
       
       } catch (error) {
-        console.error("Error handling charge.updated:", error);
+        // console.error("Error handling charge.updated:", error);
         return res.status(500).send("Internal Server Error");
       }
       break;
 
     default:
-      console.warn(`Unhandled event type ${event.type}`);
+      // console.warn(`Unhandled event type ${event.type}`);
   }
 
   res.status(200).send("Event received");

@@ -308,7 +308,7 @@ const resetPassword = async (
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
   }
 
-  console.log(payload.password);
+  // console.log(payload.password);
   // hash password
   const password = await bcrypt.hash(payload.password, 12);
 

@@ -15,7 +15,7 @@ const emailSender = async (subject: string, email: string, html: string) => {
   const emailTransport = transporter;
 
   const mailOptions = {
-    from: `"How's" <${config.emailSender.email}>`,
+    from: `"Buddy's Boddega" <${config.emailSender.email}>`,
     to: email,
     subject,
     html,
