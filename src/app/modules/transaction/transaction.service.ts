@@ -23,10 +23,8 @@ const getTransactionByCustomer = async (id: string) => {
 };
 
 const getAllTransaction = async () => {
-  const result = await prisma.transactionModel.findMany({include:{
-    order:true,
-    
-  }});
+  const result = await prisma.transactionModel.findMany(
+  );
   
   return result;
 };

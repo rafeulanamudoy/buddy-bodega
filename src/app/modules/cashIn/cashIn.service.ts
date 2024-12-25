@@ -28,6 +28,18 @@ const createCashIn = async (payload: any) => {
         totalAmount: payload.amount_total,
       },
     });
+    const orderProducts = [];
+      for (const product of payload.product) {
+        const orderProduct = await prisma.orderProduct.create({
+          data: {
+            orderId: order.id, 
+            productId: product.id, 
+            productQuantity: product.quantity,
+          },
+        });
+        orderProducts.push(orderProduct);
+      }
+
 
     const transaction = await prisma.transactionModel.create({
       data: {

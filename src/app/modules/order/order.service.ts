@@ -23,7 +23,7 @@ const getOrdersByCustomer = async (id: string) => {
       orders.map(async (order) => {
         const products = await prisma.orderProduct.findMany({
           where: { orderId: order.id }, 
-          include: { product: true }, 
+          include: { product: true,order:true }, 
         });
 
         return { orderId: order.id, products };
@@ -39,8 +39,12 @@ const getOrdersByCustomer = async (id: string) => {
 };
 
 const getAllOrders = async () => {
-  const result = await prisma.orderModel.findMany({});
-  
+  const result = await prisma.orderModel.findMany({
+    include: {
+      transactions: true, // Include transaction data
+    },
+  });
+
   return result;
 };
 const getDeliveryOrder= async () => {
