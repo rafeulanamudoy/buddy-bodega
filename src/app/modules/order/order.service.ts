@@ -56,9 +56,15 @@ console.log(whereCondition,"check where condition")
     where: whereCondition, 
     include: {
       transactions: true,
+      customer:{
+        include:{
+          user:true
+        }
+      },
       OrderProducts: {
         include: {
           product: true,
+          
         },
       },
       
@@ -80,7 +86,8 @@ const getPendingOrder= async () => {
   const result = await prisma.orderModel.findMany({where:{
     status:"PENDING",
   },include:{
-    OrderProducts:true
+    OrderProducts:true,
+  
   }});
   
   return result;
