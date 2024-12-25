@@ -38,10 +38,30 @@ const getOrdersByCustomer = async (id: string) => {
   }
 };
 
-const getAllOrders = async () => {
+const getAllOrders = async (status: string | undefined) => {
+ 
+  let whereCondition = {};
+
+
+ 
+  if (status) {
+    whereCondition = {
+      status: status.toUpperCase(), 
+    };
+  }
+
+
+console.log(whereCondition,"check where condition")
   const result = await prisma.orderModel.findMany({
+    where: whereCondition, 
     include: {
-      transactions: true, // Include transaction data
+      transactions: true,
+      OrderProducts: {
+        include: {
+          product: true,
+        },
+      },
+      
     },
   });
 
@@ -49,7 +69,18 @@ const getAllOrders = async () => {
 };
 const getDeliveryOrder= async () => {
   const result = await prisma.orderModel.findMany({where:{
-    status:"COMPLETED"
+    status:"COMPLETED",
+  },include:{
+    OrderProducts:true
+  }});
+  
+  return result;
+};
+const getPendingOrder= async () => {
+  const result = await prisma.orderModel.findMany({where:{
+    status:"PENDING",
+  },include:{
+    OrderProducts:true
   }});
   
   return result;
@@ -71,5 +102,6 @@ export const orderService = {
   getOrdersByCustomer,
   getAllOrders,
   updateSingleOrder,
-  getDeliveryOrder
+  getDeliveryOrder,
+  getPendingOrder
 };

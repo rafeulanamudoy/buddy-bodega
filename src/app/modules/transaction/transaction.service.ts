@@ -23,7 +23,9 @@ const getTransactionByCustomer = async (id: string) => {
 };
 
 const getAllTransaction = async () => {
-  const result = await prisma.transactionModel.findMany(
+  const result = await prisma.transactionModel.findMany({include:{
+    customer:true
+  }}
   );
   
   return result;
