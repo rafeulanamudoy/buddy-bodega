@@ -3,26 +3,39 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import {Prisma } from "@prisma/client";
 const getOrdersByCustomer = async (id: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-    include: {
-      customer: true,
-    },
-  });
-  if (!user || !user?.customer) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "customer not fount");
-  }
-  const result = await prisma.orderModel.findMany({
-    where: {
-      customerId: user?.customer?.id,
-    },
-    select:{
-      products:true
+  try {
+    // Fetch the user and their associated customer record
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { customer: true },
+    });
+
+    if (!user || !user?.customer) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Customer not found");
     }
-  });
-  return result;
+
+    const orders = await prisma.orderModel.findMany({
+      where: { customerId: user.customer.id },
+      select: { id: true },
+    });
+
+    const result = await Promise.all(
+      orders.map(async (order) => {
+        const products = await prisma.orderProduct.findMany({
+          where: { orderId: order.id }, 
+          include: { product: true }, 
+        });
+
+        return { orderId: order.id, products };
+      })
+    );
+
+    console.log(result, "Orders with products");
+    return result;
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Failed to fetch orders");
+  }
 };
 
 const getAllOrders = async () => {

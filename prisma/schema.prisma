@@ -35,6 +35,7 @@ model User {
 
   @@map("users")
 }
+
 model OtpModel {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String    @unique
@@ -94,28 +95,7 @@ model Admin {
 }
 
 // Product model
-model Product {
-  id            String        @id @default(auto()) @map("_id") @db.ObjectId
-  name          String        @unique
-  mainPrice     Float
-  productImage  String
-  discountPrice Float?        @default(0)
-  status        ProductStatus @default(ACTIVE)
-  details       String
-  categoryId    String        @db.ObjectId
-  category      Category      @relation(fields: [categoryId], references: [id])
-  brandName     String
-  // brandId       String?       @db.ObjectId
 
-  // brand         Brand?        @relation(fields: [brandId], references: [id])
-
-  reviews   ReviewModel[]
-  carts     CartModel[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  @@map("products")
-}
 
 // Category model
 model Category {
@@ -156,58 +136,91 @@ model CartModel {
   @@map("cartModels")
 }
 
+model OrderProduct {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  productId String     @db.ObjectId
+  product   Product    @relation(fields: [productId], references: [id])
+  productQuantity  Int
+  orderId   String     @db.ObjectId
+  order     OrderModel @relation(fields: [orderId], references: [id])
+
+  @@map("order_products ")
+}
+
 // OrderModel (Represents a customer's order)
 model OrderModel {
-  id           String             @id @default(auto()) @map("_id") @db.ObjectId
-  customerId   String             @db.ObjectId
-  customer     Customer           @relation(fields: [customerId], references: [id])
-  products     Json 
-
-  
-  totalAmount  Float
-  status       OrderStatus        @default(PENDING)
-  couponId     String?            @db.ObjectId
-  coupon       Coupon?            @relation(fields: [couponId], references: [id])
-  transactions TransactionModel[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  customerId    String             @db.ObjectId
+  customer      Customer           @relation(fields: [customerId], references: [id])
+  // products      Json
+  totalAmount   Float
+  status        OrderStatus        @default(PENDING)
+  couponId      String?            @db.ObjectId
+  coupon        Coupon?            @relation(fields: [couponId], references: [id])
+  transactions  TransactionModel[]
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
   // Invoice      Invoice[]
+  OrderProducts OrderProduct[]
 
   @@map("orders")
+}
+model Product {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  name          String        @unique
+  mainPrice     Float
+  productImage  String
+  discountPrice Float?        @default(0)
+  status        ProductStatus @default(ACTIVE)
+  details       String
+  categoryId    String        @db.ObjectId
+  category      Category      @relation(fields: [categoryId], references: [id])
+  brandName     String
+  // brandId       String?       @db.ObjectId
+
+  // brand         Brand?        @relation(fields: [brandId], references: [id])
+
+  reviews       ReviewModel[]
+  carts         CartModel[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  OrderProducts OrderProduct[]
+
+  @@map("products")
 }
 
 // TransactionModel (Tracks payments for orders)
 model TransactionModel {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  customerId      String     @db.ObjectId
-  orderId         String     @db.ObjectId
-  customer        Customer   @relation(fields: [customerId], references: [id])
-  order           OrderModel @relation(fields: [orderId], references: [id])
- 
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  customerId String     @db.ObjectId
+  orderId    String     @db.ObjectId
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  order      OrderModel @relation(fields: [orderId], references: [id])
+
   amount          Float
   paymentMethod   String
   // recipient       String
-  transactionDate DateTime   @default(now())
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  transactionDate DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@map("transactions")
 }
 
 // BillingAddress (Stores billing address for an order)
 model BillingAddress {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  firstName String
-  lastName  String
-  city      String
-  state     String
-  zipCode   String
-  address   String
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  firstName   String
+  lastName    String
+  city        String
+  state       String
+  zipCode     String
+  address     String
   phoneNumber String
 
   // Invoice   Invoice[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("billingAddress")
 }
@@ -280,8 +293,6 @@ enum CouponStatus {
   EXPIRED
   INACTIVE
 }
-
-
 
 enum UserRole {
   ADMIN
@@ -383,7 +394,6 @@ enum TypicallyConsume {
 enum CaliforniaProducts {
   YES
   NO
-  
 }
 
 enum NewProductsInDifferentCategory {

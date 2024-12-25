@@ -80,7 +80,7 @@ const saveTransactionBillingAndOrder = async (session:any) => {
     
    const customer_billing_address= JSON.parse(session.metadata.customer_billing_address)
 
-   const product=JSON.parse(session.metadata.customer_product)
+   const products=JSON.parse(session.metadata.customer_product)
 
   //  console.log(customer_billing_address,"check customer billing address")
   //  console.log(product,"check product ")
@@ -89,11 +89,23 @@ const saveTransactionBillingAndOrder = async (session:any) => {
       const order = await prisma.orderModel.create({
           data: {
               customerId: findCustomer.customer.id, 
-              products: product,
+              
               totalAmount: session.amount_total , 
               
           },
       });
+
+      const orderProducts = [];
+      for (const product of products) {
+        const orderProduct = await prisma.orderProduct.create({
+          data: {
+            orderId: order.id, 
+            productId: product.id, 
+            productQuantity: product.quantity,
+          },
+        });
+        orderProducts.push(orderProduct);
+      }
 
       //  console.log(session.id,"check session id")
       const transaction = await prisma.transactionModel.create({

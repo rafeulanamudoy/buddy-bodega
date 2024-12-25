@@ -82,13 +82,15 @@ export const getCartByCustomer = async (id: string) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Customer not found");
   }
 
-  const result = await prisma.customer.findUnique({
+  const result = await prisma.cartModel.findMany({
     where: {
-      id: user.customer.id, // Extract and pass the `id` as a string
+      customerId: user.customer.id, // Extract and pass the `id` as a string
     },
-    select:{
-      cart:true
-    }
+  include :{
+    product : true
+  }
+
+  
    
   });
 

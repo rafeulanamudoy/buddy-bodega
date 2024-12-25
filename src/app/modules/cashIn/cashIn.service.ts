@@ -24,7 +24,7 @@ const createCashIn = async (payload: any) => {
     const order = await prisma.orderModel.create({
       data: {
         customerId: findCustomer.customer.id,
-        products: payload.product,
+    
         totalAmount: payload.amount_total,
       },
     });
