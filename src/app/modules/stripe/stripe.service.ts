@@ -60,96 +60,150 @@ const createPayment = async (data: {
   return session;
 };
 
-const saveTransactionBillingAndOrder = async (session:any) => {
-  try {
-  //  console.log(session,"check session")
+// const saveTransactionBillingAndOrder = async (session:any) => {
+//   try {
+//   //  console.log(session,"check session")
 
-    // console.log(session.client_reference_id,"check client reference id")
-    const findCustomer=await prisma.user.findUnique({
-      where:{
-        id:session.client_reference_id
-      },include:{
-        customer:true
-      }
-    })
+//     // console.log(session.client_reference_id,"check client reference id")
+//     const findCustomer=await prisma.user.findUnique({
+//       where:{
+//         id:session.client_reference_id
+//       },include:{
+//         customer:true
+//       }
+//     })
 
-    // console.log(findCustomer,"check findcustomer")
-    if(!findCustomer || !findCustomer.customer  ){
-      throw new ApiError(httpStatus.UNAUTHORIZED,"customer not found")
-    }
+//     // console.log(findCustomer,"check findcustomer")
+//     if(!findCustomer || !findCustomer.customer  ){
+//       throw new ApiError(httpStatus.UNAUTHORIZED,"customer not found")
+//     }
     
-   const customer_billing_address= JSON.parse(session.metadata.customer_billing_address)
+//    const customer_billing_address= JSON.parse(session.metadata.customer_billing_address)
 
-   const products=JSON.parse(session.metadata.customer_product)
+//    const products=JSON.parse(session.metadata.customer_product)
 
-  //  console.log(customer_billing_address,"check customer billing address")
-  //  console.log(product,"check product ")
+//   //  console.log(customer_billing_address,"check customer billing address")
+//   //  console.log(product,"check product ")
       
 
-      const order = await prisma.orderModel.create({
-          data: {
-              customerId: findCustomer.customer.id, 
+//       const order = await prisma.orderModel.create({
+//           data: {
+//               customerId: findCustomer.customer.id, 
               
-              totalAmount: session.amount_total , 
+//               totalAmount: session.amount_total , 
               
-          },
-      });
+//           },
+//       });
 
-      const orderProducts = [];
-      for (const product of products) {
-        const orderProduct = await prisma.orderProduct.create({
-          data: {
-            orderId: order.id, 
-            productId: product.id, 
-            productQuantity: product.quantity,
-          },
-        });
-        orderProducts.push(orderProduct);
-      }
+//       for (const product of products) {
+//          await prisma.orderProduct.create({
+//           data: {
+//             orderId: order.id, 
+//             productId: product.id, 
+//             productQuantity: product.quantity,
+//           },
+//         });
+//         // orderProducts.push(orderProduct);
+//       }
 
-      //  console.log(session.id,"check session id")
-      const transaction = await prisma.transactionModel.create({
-          data: {
-              customerId: findCustomer.customer.id,
-              orderId: order.id,
+//       //  console.log(session.id,"check session id")
+//       const transaction = await prisma.transactionModel.create({
+//           data: {
+//               customerId: findCustomer.customer.id,
+//               orderId: order.id,
              
-              amount: session.amount_total , 
-              paymentMethod: session.payment_method_types[0], 
+//               amount: session.amount_total , 
+//               paymentMethod: session.payment_method_types[0], 
             
-          }, 
-      });
-      const billingAddress=await prisma.billingAddress.create({
-        data:{
-          ...customer_billing_address
-        }
-      })
-      let deleteMany
-      // console.log(findCustomer.customer.id,"customer id")
-      if (findCustomer.customer.id ) {
-        // console.log(findCustomer.customer.id)
-       deleteMany=  await prisma.cartModel.deleteMany({
-          where: {
-            customerId: findCustomer.customer.id,
-          },
-        });
-      }
+//           }, 
+//       });
+//       const billingAddress=await prisma.billingAddress.create({
+//         data:{
+//           ...customer_billing_address
+//         }
+//       })
+//       let deleteMany
+//       // console.log(findCustomer.customer.id,"customer id")
+//       if (findCustomer.customer.id ) {
+//         // console.log(findCustomer.customer.id)
+//        deleteMany=  await prisma.cartModel.deleteMany({
+//           where: {
+//             customerId: findCustomer.customer.id,
+//           },
+//         });
+//       }
 
 
-// console.log(deleteMany,"check ")
+// // console.log(deleteMany,"check ")
     
 
-      return {
-         
-          order,
-          transaction,
-          billingAddress
-      };
-  } catch (error) {
-      // console.error('Error saving transaction and order:', error);
-      throw new Error('Error saving transaction and order.');
-  }
-};
+//       return {
+//           order,
+//           transaction,
+//           billingAddress
+//       };
+//   } catch (error) {
+//       console.error('Error saving transaction and order:', error);
+//       throw new Error('Error saving transaction and order.');
+//   }
+// };
 
+
+
+const saveTransactionBillingAndOrder = async (session:any) => {
+  const { client_reference_id, metadata, amount_total, payment_method_types } = session;
+
+  const findCustomer = await prisma.user.findUnique({
+    where: { id: client_reference_id },
+    include: { customer: true }
+  });
+
+ 
+
+  const customerBillingAddress = JSON.parse(metadata.customer_billing_address);
+  const products = JSON.parse(metadata.customer_product);
+
+  return prisma.$transaction(async (prisma) => {
+    if (!findCustomer || !findCustomer.customer) {
+      throw new ApiError(httpStatus.UNAUTHORIZED, "Customer not found");
+    }
+    const order = await prisma.orderModel.create({
+      data: { customerId: findCustomer.customer.id, totalAmount: amount_total }
+    });
+
+    for (const product of products) {
+      await prisma.orderProduct.create({
+        data: {
+          orderId: order.id,
+          productId: product.id,
+          productQuantity: product.quantity
+        }
+      });
+    }
+
+    const transaction = await prisma.transactionModel.create({
+      data: {
+        customerId: findCustomer.customer.id,
+        orderId: order.id,
+        amount: amount_total,
+        paymentMethod: payment_method_types[0]
+      }
+    });
+
+    const billingAddress = await prisma.billingAddress.create({
+      data: { ...customerBillingAddress }
+    });
+
+    await prisma.cartModel.deleteMany({
+      where: { customerId: findCustomer.customer.id }
+    });
+
+    return { order, transaction, billingAddress };
+  }).catch((error) => {
+    console.error('Error saving transaction and order:', error);
+    throw new Error('Error saving transaction and order.');
+  });
+};
 
 export const stripeService = {
   createPayment,

@@ -79,7 +79,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     config.jwt.expires_in as string
   );
 
-  if (userData.status === UserStatus.PENDING) {
+  if (userData.status === UserStatus.PENDING && userData.role==="USER") {
     // Send the OTP email
     await emailSender("OTP", payload.email, html);
     const existingOtp = await prisma.otpModel.findUnique({

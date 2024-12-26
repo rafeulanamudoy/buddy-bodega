@@ -39,6 +39,7 @@ const createPayment = catchAsync(async (req: Request, res: Response) => {
 });
 const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'] as string;
+ console.log(sig);
  
   if (!sig) {
     return sendResponse(res, {
@@ -67,9 +68,8 @@ const saveTransactionBillingAndOrder = catchAsync(async (req: Request, res: Resp
         return result;
       } catch (error) {
         console.error("Error saving transaction:", error);
-        return res.status(500).send("Internal Server Error");
+        return res.status(500).send(error);
       }
-      break;
 
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object as Stripe.PaymentIntent;

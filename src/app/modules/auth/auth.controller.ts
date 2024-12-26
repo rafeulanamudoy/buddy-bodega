@@ -21,7 +21,6 @@ const enterOtp = catchAsync(async (req: Request, res: Response) => {
 
   // res.cookie("token", result.accessToken, { httpOnly: true });
 
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

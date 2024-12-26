@@ -15,10 +15,10 @@ import { cashInRoute } from "../modules/cashIn/cashInRoute";
 const router = express.Router();
 
 const moduleRoutes = [
-  // {
-  //   path: "/users",
-  //   route: userRoutes,
-  // },
+  {
+    path: "/users",
+    route: userRoutes,
+  },
 
   {
     path: "/auth",
