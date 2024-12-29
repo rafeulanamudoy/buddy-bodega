@@ -19,10 +19,12 @@ router.post(
 router.get(
   "/get-all-products",
   // auth(UserRole.ADMIN, UserRole.USER),
-  optionalAuth(UserRole.ADMIN, UserRole.USER),
+  //  optionalAuth(UserRole.ADMIN, UserRole.USER),
 
   productController.getProducts
 );
 router.get("/single-product/:id", productController.getSingleProduct);
+router.patch("/update-product/:id", productController.updateProduct);
+router.delete("/delete-product/:id", productController.deleteProduct);
 
 export const productRoute = router;

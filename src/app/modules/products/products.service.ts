@@ -136,8 +136,49 @@ const getProducts = async (
     data: result,
   };
 };
+const updateProduct = async (id: string, payload: any) => {
+
+  const isExist= await  prisma.product.findUnique({
+    where:{
+      id:id
+    },
+
+  })
+  if(!isExist){
+    throw new ApiError(httpStatus.UNAUTHORIZED,"product not found")
+  }
+  return await prisma.product.update({
+    where: {
+      id: id, 
+    },
+    data: {
+      ...payload, 
+    },
+  });
+};
+
+const deleteProduct=async (id: string) => {
+
+  const isExist= await  prisma.product.findUnique({
+    where:{
+      id:id
+    },
+
+  })
+  if(!isExist){
+    throw new ApiError(httpStatus.UNAUTHORIZED,"product not found")
+  }
+  return await prisma.product.delete({
+    where: {
+      id: id, 
+    },
+   
+  });
+};
 export const productService = {
   createProducts,
   getSingleProduct,
   getProducts,
+  updateProduct,
+  deleteProduct
 };

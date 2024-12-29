@@ -17,7 +17,17 @@ const createCart = async (payload: CartModel) => {
       email: customer.email,
     },
   });
+
   if (findCustomer) {
+    const allreadyCartAdded = await prisma.cartModel.findFirst({
+      where: {
+        productId: payload.productId,
+      },
+    });
+
+    if (allreadyCartAdded) {
+      throw new ApiError(400, "Already add to cart");
+    }
     const result = await prisma.cartModel.create({
       data: {
         quantity: payload.quantity,
@@ -86,12 +96,9 @@ export const getCartByCustomer = async (id: string) => {
     where: {
       customerId: user.customer.id, // Extract and pass the `id` as a string
     },
-  include :{
-    product : true
-  }
-
-  
-   
+    include: {
+      product: true,
+    },
   });
 
   if (!result) {
