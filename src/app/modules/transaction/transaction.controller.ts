@@ -28,13 +28,24 @@ const getAllTransaction=catchAsync(async (req: any, res: Response) => {
     });
   });
 
+  const totalCost=catchAsync(async (req: any, res: Response) => {
 
+
+    const result = await transactionService.totalCost();
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "total Cost get successfully",
+      data: result,
+    });
+  });
 
 
 
   export const transactionController={
     getTransactionByCustomer,
-    getAllTransaction
+    getAllTransaction,
+    totalCost
         
   
   }

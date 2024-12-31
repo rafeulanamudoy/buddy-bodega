@@ -31,9 +31,19 @@ const getAllTransaction = async () => {
   return result;
 };
 
+const totalCost=async()=>{
+
+ const result=await prisma.transactionModel.findMany({
+
+ })
+ const totalAmount = result.reduce((sum, transaction) => sum + transaction.amount, 0);
+return totalAmount
+ 
+}
 
 export const transactionService = {
   getTransactionByCustomer,
   getAllTransaction,
+  totalCost
 
 };

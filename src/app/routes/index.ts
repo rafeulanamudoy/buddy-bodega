@@ -58,7 +58,8 @@ const moduleRoutes = [
   {
     path:"/cashIn",
     route:cashInRoute
-  }
+  },
+  
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));

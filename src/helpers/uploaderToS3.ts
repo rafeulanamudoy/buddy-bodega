@@ -29,26 +29,26 @@ export const uploadFileToSpace = async (
 
   try {
     // Get image metadata
-    const metadata: Metadata = await sharp(file.buffer).metadata();
+    // const metadata: Metadata = await sharp(file.buffer).metadata();
 
-    // Conditional resizing
-    let resizeOptions = {};
-    if (metadata.height && metadata.height > 500) {
-      resizeOptions = { height: 500 };
-    } else if (metadata.width && metadata.width > 500) {
-      resizeOptions = { width: 500 };
-    } else if (metadata.height && metadata.width && metadata.height > 500 && metadata.width > 500) {
-      resizeOptions = { width: 500, height: 500 };
-    }
+    // // Conditional resizing
+    // let resizeOptions = {};
+    // if (metadata.height && metadata.height > 500) {
+    //   resizeOptions = { height: 500 };
+    // } else if (metadata.width && metadata.width > 500) {
+    //   resizeOptions = { width: 500 };
+    // } else if (metadata.height && metadata.width && metadata.height > 500 && metadata.width > 500) {
+    //   resizeOptions = { width: 500, height: 500 };
+    // }
 
-    const compressedBuffer = await sharp(file.buffer)
-      .resize(resizeOptions)
-      .toBuffer();
+    // const compressedBuffer = await sharp(file.buffer)
+    //   .resize(resizeOptions)
+    //   .toBuffer();
 
     const params = {
       Bucket: process.env.DO_SPACE_BUCKET, // Your Space name
       Key: `${folder}/${Date.now()}_${file.originalname}`, // Object key in the Space
-      Body: compressedBuffer, // Use the compressed buffer
+      Body: file.buffer, // Use the compressed buffer
       ContentType: file.mimetype,
       ACL: "public-read" as ObjectCannedACL, // Make the object publicly accessible
     };

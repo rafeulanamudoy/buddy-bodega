@@ -51,11 +51,11 @@ const loginUser = async (payload: { email: string; password: string }) => {
   console.log(userData,"checj user data")
 
   if (!userData) {
-    throw new Error("User not found");
+    throw new ApiError(httpStatus.NOT_FOUND,"User not found");
   }
 
   if (!payload.password || !userData?.password) {
-    throw new Error("Password is required");
+    throw new ApiError(httpStatus.BAD_REQUEST,"Password is required");
   }
 
  

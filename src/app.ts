@@ -8,6 +8,7 @@ import { PrismaClient } from "@prisma/client";
 import path from "path";
 import Stripe from "stripe"; // Import Stripe
 import { StripeController } from "./app/modules/stripe/stripe.controller";
+import { cashInController } from "./app/modules/cashIn/cashInController";
 const app: Application = express();
 const prisma = new PrismaClient();
 
@@ -66,6 +67,15 @@ app.use(
   StripeController.saveTransactionBillingAndOrder
 )
 app.use(express.json());
+app.use(
+  "/api/v1/onfleet/payment-webhook",
+  express.raw({ type: "application/json" }),
+  cashInController.onFleetWebhook
+)
+
+
+
+
 // app.use(express.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));

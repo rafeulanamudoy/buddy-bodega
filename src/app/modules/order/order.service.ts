@@ -63,7 +63,7 @@ console.log(whereCondition,"check where condition")
       },
       OrderProducts: {
         include: {
-          // product: true,
+          product: true,
           // order : true
           
         },

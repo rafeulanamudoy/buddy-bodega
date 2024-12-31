@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
-
+import Onfleet from "@onfleet/node-onfleet"
 const createCashIn = async (payload: any) => {
 
     console.log(payload,"check payload")
@@ -28,16 +28,16 @@ const createCashIn = async (payload: any) => {
         totalAmount: payload.amount_total,
       },
     });
-    const orderProducts = [];
+  
       for (const product of payload.product) {
-        const orderProduct = await prisma.orderProduct.create({
+      await prisma.orderProduct.create({
           data: {
             orderId: order.id, 
             productId: product.id, 
             productQuantity: product.quantity,
           },
         });
-        orderProducts.push(orderProduct);
+
       }
 
 
