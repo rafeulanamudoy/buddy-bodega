@@ -68,11 +68,11 @@ app.use(
   StripeController.saveTransactionBillingAndOrder
 )
 app.use(express.json());
-app.use(
-  "/api/v1/onfleet/payment-webhook",
-  express.raw({ type: "application/json" }),
-  cashInController.onFleetWebhook
-)
+// app.use(
+//   "/api/v1/onfleet/payment-webhook",
+//   express.raw({ type: "application/json" }),
+//   cashInController.onFleetWebhook
+// )
 
 
 

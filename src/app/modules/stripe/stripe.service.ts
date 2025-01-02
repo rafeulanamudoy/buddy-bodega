@@ -21,6 +21,14 @@ const createPayment = async (data: {
   customerEmail: string;
 }) => {
   // Serialize product data
+
+  const findCustomer = await prisma.user.findUnique({
+    where: { id: data.client_reference_id },
+    include: { customer: true },
+  });
+if(!findCustomer){
+  throw new ApiError(httpStatus.NOT_FOUND,"customer not found")
+}
   const serializedProducts = JSON.stringify(data.product);
 
   // Serialize billing and shipping addresses
