@@ -38,7 +38,7 @@ const getAllOrders=catchAsync(async (req: any, res: Response) => {
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "all orders get successfully",
+      message: "update order successfully",
       data: result,
     });
   });
@@ -54,10 +54,22 @@ const getAllOrders=catchAsync(async (req: any, res: Response) => {
       data: result,
     });
   });
+  const cancelOrder=catchAsync(async (req: Request, res: Response) => {
+
+
+    const result = await orderService.cancelOrder(req.params.id,req.body);
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: " orders cancel successfully",
+      data: result,
+    });
+  });
+
 
 
   export const orderController={
     getOrdersByCustomer,
     getAllOrders,
-    updateOrder,getDeliveryOrder
+    updateOrder,getDeliveryOrder,cancelOrder
   }

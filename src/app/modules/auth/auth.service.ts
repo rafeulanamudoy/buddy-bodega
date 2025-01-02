@@ -69,6 +69,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("Password incorrect!");
   }
 
+
   const accessToken = jwtHelpers.generateToken(
     {
       id: userData.id,

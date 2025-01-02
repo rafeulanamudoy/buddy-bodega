@@ -155,6 +155,8 @@ model OrderModel {
   // products      Json
   totalAmount   Float
   status        OrderStatus        @default(PENDING)
+  stripeSessionId   String?
+  cancellation_notes   String?
   couponId      String?            @db.ObjectId
   coupon        Coupon?            @relation(fields: [couponId], references: [id])
   transactions  TransactionModel[]
