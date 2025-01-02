@@ -17,22 +17,48 @@ const getOrdersByCustomer = async (id: string) => {
 
     const orders = await prisma.orderModel.findMany({
       where: { customerId: user.customer.id },
-      select: { id: true },
+     include: {
+      transactions: true,
+      customer: {
+        select: {
+          email:true,
+          address:true,
+          city:true,
+          state:true,
+          zipCode:true,
+          user:{
+            select:{
+              firstName:true,
+              lastName:true,
+              nickName:true,
+              profileImage:true,phone:true
+            }
+          }
+    
+        },
+        
+      },
+     OrderProducts:{
+      include:{
+        product:true
+      }
+     }
+    },
     });
 
-    const result = await Promise.all(
-      orders.map(async (order) => {
-        const products = await prisma.orderProduct.findMany({
-          where: { orderId: order.id },
-          include: { product: true, order: true },
-        });
+    // const result = await Promise.all(
+    //   orders.map(async (order) => {
+    //     const products = await prisma.orderProduct.findMany({
+    //       where: { orderId: order.id },
+          
+    //     });
 
-        return { orderId: order.id, products };
-      })
-    );
+    //     return { orderId: order.id,products};
+    //   })
+    // );
 
-    console.log(result, "Orders with products");
-    return result;
+    // console.log(result, "Orders with products");
+    return orders;
   } catch (error) {
     console.error("Error fetching orders:", error);
     throw new ApiError(
@@ -57,16 +83,29 @@ const getAllOrders = async (status: string | undefined) => {
     include: {
       transactions: true,
       customer: {
-        include: {
-          user: true,
+        select: {
+          email:true,
+          address:true,
+          city:true,
+          state:true,
+          zipCode:true,
+          user:{
+            select:{
+              firstName:true,
+              lastName:true,
+              nickName:true,
+              profileImage:true,phone:true
+            }
+          }
+    
         },
+        
       },
-      OrderProducts: {
-        include: {
-          product: true,
-          // order : true
-        },
-      },
+     OrderProducts:{
+      include:{
+        product:true
+      }
+     }
     },
   });
 

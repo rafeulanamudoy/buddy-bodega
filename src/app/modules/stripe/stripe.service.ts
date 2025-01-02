@@ -42,7 +42,7 @@ if(!findCustomer){
       product_data: {
         name: product.id,
       },
-      unit_amount: product.mainPrice * 100, // Stripe expects amount in cents
+      unit_amount: product.mainPrice * 100, 
     },
     quantity: product.quantity,
   }));
@@ -130,8 +130,15 @@ const refundPayment = async (sessionId: string) => {
     // Retrieve the Checkout Session
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    // Expire the Checkout Session
-    const refund = await stripe.checkout.sessions.expire(sessionId);
+    if (!session.payment_intent) {
+      throw new Error('Payment Intent not found for this session');
+    }
+
+    // Refund the Payment Intent
+    const refund = await stripe.refunds.create({
+      payment_intent: session.payment_intent as string,
+    });
+
     return refund;
   } catch (error) {
     console.error('Error during refund:', error);
