@@ -22,7 +22,7 @@ const createOnfleetTask = async (order: any) => {
           phone: order.customer.phone,
         },
       ],
-      notes: `Order ID: ${order.id}`,
+      notes: `Order ID: ${order.orderId}`,
       pickupTask: false,
     });
 

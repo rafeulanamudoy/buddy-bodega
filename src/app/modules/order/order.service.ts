@@ -158,9 +158,16 @@ const acceptOrder = async (id: string, payload: any) => {
     data: {
       status: OrderStatus.COMPLETED,
     },
+    include: {
+      customer: true,
+    },
   });
-  const onfleetTask = await OnfleetService.createOnfleetTask(payload);
-  return result;
+
+  const onfleetTask = await OnfleetService.createOnfleetTask({
+    ...payload,
+    orderId: id,
+  });
+  return { result, onfleetTask };
 };
 const cancelOrder = async (
   id: string,

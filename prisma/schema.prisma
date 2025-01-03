@@ -159,6 +159,8 @@ model OrderModel {
   cancellation_notes   String?
   couponId      String?            @db.ObjectId
   coupon        Coupon?            @relation(fields: [couponId], references: [id])
+   billingAddressId  String?            @db.ObjectId @unique
+  billingAddress    BillingAddress?    @relation(fields: [billingAddressId], references: [id])
   transactions  TransactionModel[]
   createdAt     DateTime           @default(now())
   updatedAt     DateTime           @updatedAt
@@ -219,12 +221,13 @@ model BillingAddress {
   zipCode     String
   address     String
   phoneNumber String
-
+ orderModel OrderModel?
   // Invoice   Invoice[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("billingAddress")
+ 
 }
 
 // ReviewModel (Tracks product reviews by customers)

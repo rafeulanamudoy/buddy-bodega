@@ -26,9 +26,9 @@ const createPayment = async (data: {
     where: { id: data.client_reference_id },
     include: { customer: true },
   });
-if(!findCustomer){
-  throw new ApiError(httpStatus.NOT_FOUND,"customer not found")
-}
+  if (!findCustomer) {
+    throw new ApiError(httpStatus.NOT_FOUND, "customer not found");
+  }
   const serializedProducts = JSON.stringify(data.product);
 
   // Serialize billing and shipping addresses
@@ -42,7 +42,7 @@ if(!findCustomer){
       product_data: {
         name: product.id,
       },
-      unit_amount: product.mainPrice * 100, 
+      unit_amount: product.mainPrice * 100,
     },
     quantity: product.quantity,
   }));
@@ -83,11 +83,19 @@ const saveTransactionBillingAndOrder = async (session: any) => {
       if (!findCustomer || !findCustomer.customer) {
         throw new ApiError(httpStatus.UNAUTHORIZED, "Customer not found");
       }
+      const billingAddress = await prisma.billingAddress.create({
+        data: { ...customerBillingAddress },
+      });
+
+      await prisma.cartModel.deleteMany({
+        where: { customerId: findCustomer.customer.id },
+      });
       const order = await prisma.orderModel.create({
         data: {
           customerId: findCustomer.customer.id,
           totalAmount: amount_total,
-          stripeSessionId:session.id
+          stripeSessionId: session.id,
+          billingAddressId: billingAddress.id,
         },
       });
 
@@ -110,14 +118,6 @@ const saveTransactionBillingAndOrder = async (session: any) => {
         },
       });
 
-      const billingAddress = await prisma.billingAddress.create({
-        data: { ...customerBillingAddress },
-      });
-
-      await prisma.cartModel.deleteMany({
-        where: { customerId: findCustomer.customer.id },
-      });
-
       return { order, transaction, billingAddress };
     })
     .catch((error) => {
@@ -131,7 +131,7 @@ const refundPayment = async (sessionId: string) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (!session.payment_intent) {
-      throw new Error('Payment Intent not found for this session');
+      throw new Error("Payment Intent not found for this session");
     }
 
     // Refund the Payment Intent
@@ -141,12 +141,12 @@ const refundPayment = async (sessionId: string) => {
 
     return refund;
   } catch (error) {
-    console.error('Error during refund:', error);
-    throw new Error('Could not process refund');
+    console.error("Error during refund:", error);
+    throw new Error("Could not process refund");
   }
 };
 export const stripeService = {
   createPayment,
   saveTransactionBillingAndOrder,
-  refundPayment
+  refundPayment,
 };
