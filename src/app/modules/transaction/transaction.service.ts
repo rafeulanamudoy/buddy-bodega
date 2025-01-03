@@ -1,7 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
-import {Prisma } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 const getTransactionByCustomer = async (id: string) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -23,27 +23,30 @@ const getTransactionByCustomer = async (id: string) => {
 };
 
 const getAllTransaction = async () => {
-  const result = await prisma.transactionModel.findMany({include:{
-    customer:true
-  }}
-  );
-  
+  const result = await prisma.transactionModel.findMany({
+    include: {
+      customer: true,
+    },
+  });
+
   return result;
 };
 
-const totalCost=async()=>{
-
- const result=await prisma.transactionModel.findMany({
-
- })
- const totalAmount = result.reduce((sum, transaction) => sum + transaction.amount, 0);
-return totalAmount
- 
-}
+const totalCost = async () => {
+  const result = await prisma.orderModel.findMany({
+    where: {
+      status: OrderStatus.COMPLETED,
+    },
+  });
+  const totalAmount = result.reduce(
+    (sum, transaction) => sum + transaction.totalAmount,
+    0
+  );
+  return totalAmount;
+};
 
 export const transactionService = {
   getTransactionByCustomer,
   getAllTransaction,
-  totalCost
-
+  totalCost,
 };

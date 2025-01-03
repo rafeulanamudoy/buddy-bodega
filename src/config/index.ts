@@ -7,13 +7,17 @@ export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   backend_base_url: process.env.BACKEND_BASE_URL,
-  base_url:process.env.BASE_URL,
+  base_url: process.env.BASE_URL,
   // Payment configurations
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
     publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
     clientId: process.env.STRIPE_CLIENT_ID,
     webhookSecret: process.env.STRIPE_WEBHOOK_SECRET_KEY,
+  },
+
+  onfleet: {
+    apiKey: process.env.ONFLEET_API_KEY,
   },
 
   paypal: {

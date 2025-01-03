@@ -3,6 +3,7 @@ import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiErrors";
 import { OrderStatus, Prisma } from "@prisma/client";
 import { stripeService } from "../stripe/stripe.service";
+import { OnfleetService } from "../onfleet/onfleet.service";
 const getOrdersByCustomer = async (id: string) => {
   try {
     // Fetch the user and their associated customer record
@@ -17,40 +18,39 @@ const getOrdersByCustomer = async (id: string) => {
 
     const orders = await prisma.orderModel.findMany({
       where: { customerId: user.customer.id },
-     include: {
-      transactions: true,
-      customer: {
-        select: {
-          email:true,
-          address:true,
-          city:true,
-          state:true,
-          zipCode:true,
-          user:{
-            select:{
-              firstName:true,
-              lastName:true,
-              nickName:true,
-              profileImage:true,phone:true
-            }
-          }
-    
+      include: {
+        transactions: true,
+        customer: {
+          select: {
+            email: true,
+            address: true,
+            city: true,
+            state: true,
+            zipCode: true,
+            user: {
+              select: {
+                firstName: true,
+                lastName: true,
+                nickName: true,
+                profileImage: true,
+                phone: true,
+              },
+            },
+          },
         },
-        
+        OrderProducts: {
+          include: {
+            product: true,
+          },
+        },
       },
-     OrderProducts:{
-      include:{
-        product:true
-      }
-     }
-    },
     });
 
     // const result = await Promise.all(
     //   orders.map(async (order) => {
     //     const products = await prisma.orderProduct.findMany({
     //       where: { orderId: order.id },
-          
+
     //     });
 
     //     return { orderId: order.id,products};
@@ -84,28 +84,27 @@ const getAllOrders = async (status: string | undefined) => {
       transactions: true,
       customer: {
         select: {
-          email:true,
-          address:true,
-          city:true,
-          state:true,
-          zipCode:true,
-          user:{
-            select:{
-              firstName:true,
-              lastName:true,
-              nickName:true,
-              profileImage:true,phone:true
-            }
-          }
-    
+          email: true,
+          address: true,
+          city: true,
+          state: true,
+          zipCode: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              nickName: true,
+              profileImage: true,
+              phone: true,
+            },
+          },
         },
-        
       },
-     OrderProducts:{
-      include:{
-        product:true
-      }
-     }
+      OrderProducts: {
+        include: {
+          product: true,
+        },
+      },
     },
   });
 
@@ -151,12 +150,23 @@ const updateSingleOrder = async (
   return result;
 };
 
+const acceptOrder = async (id: string, payload: any) => {
+  const result = await prisma.orderModel.update({
+    where: {
+      id: id,
+    },
+    data: {
+      status: OrderStatus.COMPLETED,
+    },
+  });
+  const onfleetTask = await OnfleetService.createOnfleetTask(payload);
+  return result;
+};
 const cancelOrder = async (
   id: string,
   payload: Prisma.OrderModelUpdateInput
 ) => {
   try {
-
     const order = await prisma.orderModel.findUnique({
       where: {
         id: id,
@@ -164,10 +174,12 @@ const cancelOrder = async (
     });
 
     if (!order || !order.stripeSessionId) {
-      throw new ApiError(httpStatus.BAD_REQUEST,'Order or sessionId not found');
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        "Order or sessionId not found"
+      );
     }
 
-   
     const updatedOrder = await prisma.orderModel.update({
       where: {
         id: id,
@@ -177,16 +189,18 @@ const cancelOrder = async (
       },
     });
 
-
-    const refund = await stripeService.refundPayment(order.stripeSessionId) 
+    const refund = await stripeService.refundPayment(order.stripeSessionId);
 
     return {
       updatedOrder,
       refund,
     };
   } catch (error) {
-    console.error('Error during order cancellation and refund:', error);
-    throw new ApiError(httpStatus.BAD_REQUEST,'Could not cancel order and process refund');
+    console.error("Error during order cancellation and refund:", error);
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Could not cancel order and process refund"
+    );
   }
 };
 export const orderService = {
@@ -196,4 +210,5 @@ export const orderService = {
   getDeliveryOrder,
   getPendingOrder,
   cancelOrder,
+  acceptOrder,
 };
