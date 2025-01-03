@@ -33,16 +33,22 @@ const getAllTransaction = async () => {
 };
 
 const totalCost = async () => {
+  let totalAmount;
   const result = await prisma.orderModel.findMany({
     where: {
       status: OrderStatus.COMPLETED,
     },
   });
-  const totalAmount = result.reduce(
-    (sum, transaction) => sum + transaction.totalAmount,
-    0
-  );
-  return totalAmount;
+  if (result.length === 0) {
+    totalAmount = 0;
+  } else {
+    totalAmount = result.reduce(
+      (sum, transaction) => sum + transaction.totalAmount,
+      0
+    );
+  }
+
+  return { totalAmount };
 };
 
 export const transactionService = {
